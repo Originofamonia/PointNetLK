@@ -20,6 +20,8 @@ import ptlk
 LOGGER = logging.getLogger(__name__)
 LOGGER.addHandler(logging.NullHandler())
 
+os.environ['CUDA_VISIBLE_DEVICES'] = '1'
+
 
 def options(argv=None):
     parser = argparse.ArgumentParser(description='PointNet-LK')
@@ -269,7 +271,7 @@ class Action:
         p1 = p1.to(device)  # source
         igt = igt.to(device)  # igt: p0 -> p1
         r = ptlk.pointlk.PointLK.do_forward(model, p0, p1, self.max_iter,
-                                            self.xtol, \
+                                            self.xtol,
                                             self.p0_zero_mean,
                                             self.p1_zero_mean)
         # r = model(p0, p1, self.max_iter)
