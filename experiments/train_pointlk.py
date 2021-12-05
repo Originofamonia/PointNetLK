@@ -32,7 +32,7 @@ def options(argv=None):
                         default='/home/qiyuan/2021fall/PointNetLK/modelnet10/ModelNet10',
                         help='path to the input dataset')  # like '/path/to/ModelNet40'
     parser.add_argument('-c', '--categoryfile', type=str,
-                        default='/home/qiyuan/2021fall/PointNetLK/modelnet10/ModelNet10',
+                        # default='/home/qiyuan/2021fall/PointNetLK/modelnet10/ModelNet10',
                         help='path to the categories to be trained')  # eg. './sampledata/modelnet40_half1.txt'
 
     # settings for input data
