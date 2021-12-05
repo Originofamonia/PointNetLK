@@ -11,7 +11,7 @@ from .. import se3
 
 
 class ModelNet(globset.Globset):
-    """ [Princeton ModelNet](http://modelnet.cs.princeton.edu/) """
+    """ [Princeton ModelNet](https://modelnet.cs.princeton.edu/) """
 
     def __init__(self, dataset_path, train=1, transform=None, classinfo=None):
         loader = mesh.offread
@@ -136,5 +136,3 @@ class CADset4tracking_fixed_perturbation(torch.utils.data.Dataset):
 
         # p0: template, p1: source, igt: transform matrix from p0 to p1
         return p0, p1, igt
-
-# EOF

@@ -38,7 +38,7 @@ class PointLK(torch.nn.Module):
     def rsq(r):
         # |r| should be 0
         z = torch.zeros_like(r)
-        return torch.nn.functional.mse_loss(r, z, size_average=False)
+        return torch.nn.functional.mse_loss(r, z, reduction='sum')
 
     @staticmethod
     def comp(g, igt):
@@ -48,7 +48,7 @@ class PointLK(torch.nn.Module):
         assert g.size(2) == igt.size(2) and g.size(2) == 4
         A = g.matmul(igt)
         I = torch.eye(4).to(A).view(1, 4, 4).expand(A.size(0), 4, 4)
-        return torch.nn.functional.mse_loss(A, I, size_average=True) * 16
+        return torch.nn.functional.mse_loss(A, I, reduction='mean') * 16
 
     @staticmethod
     def do_forward(net, p0, p1, maxiter=10, xtol=1.0e-7, p0_zero_mean=True,
