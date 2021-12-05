@@ -10,20 +10,23 @@ import torch.utils.data
 
 def find_classes(root):
     """ find ${root}/${class}/* """
-    classes = [d for d in os.listdir(root) if os.path.isdir(os.path.join(root, d))]
+    classes = [d for d in os.listdir(root) if
+               os.path.isdir(os.path.join(root, d))]
     classes.sort()
     class_to_idx = {classes[i]: i for i in range(len(classes))}
     return classes, class_to_idx
+
 
 def classes_to_cinfo(classes):
     class_to_idx = {classes[i]: i for i in range(len(classes))}
     return classes, class_to_idx
 
+
 def glob_dataset(root, class_to_idx, ptns):
     """ glob ${root}/${class}/${ptns[i]} """
     root = os.path.expanduser(root)
     samples = []
-    #class_size = [0 for i in range(len(class_to_idx))]
+    # class_size = [0 for i in range(len(class_to_idx))]
     for target in sorted(os.listdir(root)):
         d = os.path.join(root, target)
         if not os.path.isdir(d):
@@ -33,15 +36,15 @@ def glob_dataset(root, class_to_idx, ptns):
         if target_idx is None:
             continue
 
-        #count = 0
+        # count = 0
         for i, ptn in enumerate(ptns):
             gptn = os.path.join(d, ptn)
             names = glob.glob(gptn)
             for path in sorted(names):
                 item = (path, target_idx)
                 samples.append(item)
-                #count += 1
-        #class_size[target_idx] = count
+                # count += 1
+        # class_size[target_idx] = count
 
     return samples
 
@@ -49,7 +52,9 @@ def glob_dataset(root, class_to_idx, ptns):
 class Globset(torch.utils.data.Dataset):
     """ glob ${rootdir}/${classes}/${pattern}
     """
-    def __init__(self, rootdir, pattern, fileloader, transform=None, classinfo=None):
+
+    def __init__(self, rootdir, pattern, fileloader, transform=None,
+                 classinfo=None):
         super().__init__()
 
         if isinstance(pattern, six.string_types):
@@ -62,7 +67,8 @@ class Globset(torch.utils.data.Dataset):
 
         samples = glob_dataset(rootdir, class_to_idx, pattern)
         if not samples:
-            raise RuntimeError("Empty: rootdir={}, pattern(s)={}".format(rootdir, pattern))
+            raise RuntimeError(
+                "Empty: rootdir={}, pattern(s)={}".format(rootdir, pattern))
 
         self.rootdir = rootdir
         self.pattern = pattern
@@ -81,7 +87,9 @@ class Globset(torch.utils.data.Dataset):
         fmt_str += '    File Loader: {}\n'.format(self.fileloader)
         tmp = '    Transforms (if any): '
         fmt_str += '{0}{1}\n'.format(tmp,
-                                     self.transform.__repr__().replace('\n', '\n' + ' ' * len(tmp)))
+                                     self.transform.__repr__().replace('\n',
+                                                                       '\n' + ' ' * len(
+                                                                           tmp)))
         return fmt_str
 
     def __len__(self):
@@ -135,8 +143,10 @@ class Globset(torch.utils.data.Dataset):
         dataset1 = copy.deepcopy(self)
         dataset2 = copy.deepcopy(self)
 
-        samples1 = list(map(lambda i: dataset1.samples[i], np.where(select == 1)[0]))
-        samples2 = list(map(lambda i: dataset2.samples[i], np.where(select == 0)[0]))
+        samples1 = list(
+            map(lambda i: dataset1.samples[i], np.where(select == 1)[0]))
+        samples2 = list(
+            map(lambda i: dataset2.samples[i], np.where(select == 0)[0]))
 
         dataset1.samples = samples1
         dataset2.samples = samples2
