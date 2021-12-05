@@ -16,7 +16,8 @@ import torch.utils.data
 import torchvision
 
 # addpath('../')
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir)))
+sys.path.insert(0, os.path.abspath(
+    os.path.join(os.path.dirname(__file__), os.pardir)))
 import ptlk
 
 LOGGER = logging.getLogger(__name__)
@@ -28,48 +29,62 @@ def options(argv=None):
 
     # required.
     parser.add_argument('-o', '--outfile', required=True, type=str,
-                        metavar='BASENAME', help='output filename (prefix)') # result: ${BASENAME}_feat_best.pth
+                        metavar='BASENAME',
+                        help='output filename (prefix)')  # result: ${BASENAME}_feat_best.pth
     parser.add_argument('-i', '--dataset-path', required=True, type=str,
-                        metavar='PATH', help='path to the input dataset') # like '/path/to/ModelNet40'
+                        metavar='PATH',
+                        help='path to the input dataset')  # like '/path/to/ModelNet40'
     parser.add_argument('-c', '--categoryfile', required=True, type=str,
-                        metavar='PATH', help='path to the categories to be trained') # eg. './sampledata/modelnet40_half1.txt'
+                        metavar='PATH',
+                        help='path to the categories to be trained')  # eg. './sampledata/modelnet40_half1.txt'
 
     # settings for input data
-    parser.add_argument('--dataset-type', default='modelnet', choices=['modelnet', 'shapenet2'],
-                        metavar='DATASET', help='dataset type (default: modelnet)')
+    parser.add_argument('--dataset-type', default='modelnet',
+                        choices=['modelnet', 'shapenet2'],
+                        metavar='DATASET',
+                        help='dataset type (default: modelnet)')
     parser.add_argument('--num-points', default=1024, type=int,
-                        metavar='N', help='points in point-cloud (default: 1024)')
+                        metavar='N',
+                        help='points in point-cloud (default: 1024)')
 
     # settings for PointNet
     parser.add_argument('--use-tnet', dest='use_tnet', action='store_true',
                         help='flag for setting up PointNet with TNet')
     parser.add_argument('--dim-k', default=1024, type=int,
-                        metavar='K', help='dim. of the feature vector (default: 1024)')
+                        metavar='K',
+                        help='dim. of the feature vector (default: 1024)')
     parser.add_argument('--symfn', default='max', choices=['max', 'avg'],
                         help='symmetric function (default: max)')
 
     # settings for on training
     parser.add_argument('-l', '--logfile', default='', type=str,
-                        metavar='LOGNAME', help='path to logfile (default: null (no logging))')
+                        metavar='LOGNAME',
+                        help='path to logfile (default: null (no logging))')
     parser.add_argument('-j', '--workers', default=4, type=int,
-                        metavar='N', help='number of data loading workers (default: 4)')
+                        metavar='N',
+                        help='number of data loading workers (default: 4)')
     parser.add_argument('-b', '--batch-size', default=32, type=int,
                         metavar='N', help='mini-batch size (default: 32)')
     parser.add_argument('--epochs', default=200, type=int,
                         metavar='N', help='number of total epochs to run')
     parser.add_argument('--start-epoch', default=0, type=int,
-                        metavar='N', help='manual epoch number (useful on restarts)')
+                        metavar='N',
+                        help='manual epoch number (useful on restarts)')
     parser.add_argument('--optimizer', default='Adam', choices=['Adam', 'SGD'],
-                        metavar='METHOD', help='name of an optimizer (default: Adam)')
+                        metavar='METHOD',
+                        help='name of an optimizer (default: Adam)')
     parser.add_argument('--resume', default='', type=str,
-                        metavar='PATH', help='path to latest checkpoint (default: null (no-use))')
+                        metavar='PATH',
+                        help='path to latest checkpoint (default: null (no-use))')
     parser.add_argument('--pretrained', default='', type=str,
-                        metavar='PATH', help='path to pretrained model file (default: null (no-use))')
+                        metavar='PATH',
+                        help='path to pretrained model file (default: null (no-use))')
     parser.add_argument('--device', default='cuda:0', type=str,
                         metavar='DEVICE', help='use CUDA if available')
 
     args = parser.parse_args(argv)
     return args
+
 
 def main(args):
     # dataset
@@ -124,29 +139,33 @@ def run(args, trainset, testset, action):
     # training
     LOGGER.debug('train, begin')
     for epoch in range(args.start_epoch, args.epochs):
-        #scheduler.step()
+        # scheduler.step()
 
-        running_loss, running_info = action.train_1(model, trainloader, optimizer, args.device)
+        running_loss, running_info = action.train_1(model, trainloader,
+                                                    optimizer, args.device)
         val_loss, val_info = action.eval_1(model, testloader, args.device)
 
         is_best = val_loss < min_loss
         min_loss = min(val_loss, min_loss)
 
-        LOGGER.info('epoch, %04d, %f, %f, %f, %f', epoch + 1, running_loss, val_loss, running_info, val_info)
+        LOGGER.info('epoch, %04d, %f, %f, %f, %f', epoch + 1, running_loss,
+                    val_loss, running_info, val_info)
         snap = {'epoch': epoch + 1,
                 'model': model.state_dict(),
                 'min_loss': min_loss,
-                'optimizer' : optimizer.state_dict(),}
+                'optimizer': optimizer.state_dict(), }
         if is_best:
             save_checkpoint(snap, args.outfile, 'snap_best')
             save_checkpoint(model.state_dict(), args.outfile, 'model_best')
-            save_checkpoint(model.features.state_dict(), args.outfile, 'feat_best')
+            save_checkpoint(model.features.state_dict(), args.outfile,
+                            'feat_best')
 
         save_checkpoint(snap, args.outfile, 'snap_last')
         save_checkpoint(model.state_dict(), args.outfile, 'model_last')
         save_checkpoint(model.features.state_dict(), args.outfile, 'feat_last')
 
     LOGGER.debug('train, end')
+
 
 def save_checkpoint(state, filename, suffix):
     torch.save(state, '{}_{}.pth'.format(filename, suffix))
@@ -164,13 +183,15 @@ class Action:
             self.sym_fn = ptlk.pointnet.symfn_avg
 
     def create_model(self):
-        feat = ptlk.pointnet.PointNet_features(self.dim_k, self.use_tnet, self.sym_fn)
-        return ptlk.pointnet.PointNet_classifier(self.num_classes, feat, self.dim_k)
+        feat = ptlk.pointnet.PointNet_features(self.dim_k, self.use_tnet,
+                                               self.sym_fn)
+        return ptlk.pointnet.PointNet_classifier(self.num_classes, feat,
+                                                 self.dim_k)
 
     def train_1(self, model, trainloader, optimizer, device):
         model.train()
         vloss = 0.0
-        pred  = 0.0
+        pred = 0.0
         count = 0
         for i, data in enumerate(trainloader):
             target, output, loss = self.compute_loss(model, data, device)
@@ -188,14 +209,14 @@ class Action:
             am = ag.sum()
             pred += am.item()
 
-        running_loss = float(vloss)/count
-        accuracy = float(pred)/count
+        running_loss = float(vloss) / count
+        accuracy = float(pred) / count
         return running_loss, accuracy
 
     def eval_1(self, model, testloader, device):
         model.eval()
         vloss = 0.0
-        pred  = 0.0
+        pred = 0.0
         count = 0
         with torch.no_grad():
             for i, data in enumerate(testloader):
@@ -210,8 +231,8 @@ class Action:
                 am = ag.sum()
                 pred += am.item()
 
-        ave_loss = float(vloss)/count
-        accuracy = float(pred)/count
+        ave_loss = float(vloss) / count
+        accuracy = float(pred) / count
         return ave_loss, accuracy
 
     def compute_loss(self, model, data, device):
@@ -229,42 +250,49 @@ class Action:
 class ShapeNet2_transform_coordinate:
     def __init__(self):
         pass
+
     def __call__(self, mesh):
         return mesh.clone().rot_x()
 
-def get_datasets(args):
 
+def get_datasets(args):
     cinfo = None
     if args.categoryfile:
-        #categories = numpy.loadtxt(args.categoryfile, dtype=str, delimiter="\n").tolist()
+        # categories = numpy.loadtxt(args.categoryfile, dtype=str, delimiter="\n").tolist()
         categories = [line.rstrip('\n') for line in open(args.categoryfile)]
         categories.sort()
         c_to_idx = {categories[i]: i for i in range(len(categories))}
         cinfo = (categories, c_to_idx)
 
     if args.dataset_type == 'modelnet':
-        transform = torchvision.transforms.Compose([\
-                ptlk.data.transforms.Mesh2Points(),\
-                ptlk.data.transforms.OnUnitCube(),\
-                ptlk.data.transforms.Resampler(args.num_points),\
-                ptlk.data.transforms.RandomRotatorZ(),\
-                ptlk.data.transforms.RandomJitter()\
+        transform = torchvision.transforms.Compose([ \
+            ptlk.data.transforms.Mesh2Points(), \
+            ptlk.data.transforms.OnUnitCube(), \
+            ptlk.data.transforms.Resampler(args.num_points), \
+            ptlk.data.transforms.RandomRotatorZ(), \
+            ptlk.data.transforms.RandomJitter() \
             ])
 
-        trainset = ptlk.data.datasets.ModelNet(args.dataset_path, train=1, transform=transform, classinfo=cinfo)
-        testset = ptlk.data.datasets.ModelNet(args.dataset_path, train=0, transform=transform, classinfo=cinfo)
+        trainset = ptlk.data.datasets.ModelNet(args.dataset_path, train=1,
+                                               transform=transform,
+                                               classinfo=cinfo)
+        testset = ptlk.data.datasets.ModelNet(args.dataset_path, train=0,
+                                              transform=transform,
+                                              classinfo=cinfo)
 
     elif args.dataset_type == 'shapenet2':
-        transform = torchvision.transforms.Compose([\
-                ShapeNet2_transform_coordinate(),\
-                ptlk.data.transforms.Mesh2Points(),\
-                ptlk.data.transforms.OnUnitCube(),\
-                ptlk.data.transforms.Resampler(args.num_points),\
-                ptlk.data.transforms.RandomRotatorZ(),\
-                ptlk.data.transforms.RandomJitter()\
+        transform = torchvision.transforms.Compose([ \
+            ShapeNet2_transform_coordinate(), \
+            ptlk.data.transforms.Mesh2Points(), \
+            ptlk.data.transforms.OnUnitCube(), \
+            ptlk.data.transforms.Resampler(args.num_points), \
+            ptlk.data.transforms.RandomRotatorZ(), \
+            ptlk.data.transforms.RandomJitter() \
             ])
 
-        dataset = ptlk.data.datasets.ShapeNet2(args.dataset_path, transform=transform, classinfo=cinfo)
+        dataset = ptlk.data.datasets.ShapeNet2(args.dataset_path,
+                                               transform=transform,
+                                               classinfo=cinfo)
         trainset, testset = dataset.split(0.8)
 
     return trainset, testset
@@ -282,4 +310,4 @@ if __name__ == '__main__':
     main(ARGS)
     LOGGER.debug('done (PID=%d)', os.getpid())
 
-#EOF
+# EOF
