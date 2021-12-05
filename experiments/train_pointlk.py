@@ -1,7 +1,6 @@
 """
-    Example for training a tracker (PointNet-LK).
-
-    No-noise version.
+Example for training a tracker (PointNet-LK).
+No-noise version.
 """
 
 import argparse
@@ -30,7 +29,7 @@ def options(argv=None):
     parser.add_argument('-o', '--outfile', type=str,
                         default='/home/qiyuan/2021fall/PointNetLK/outputs/modelnet.pt',
                         help='output filename (prefix)')  # the result: ${BASENAME}_model_best.pth
-    parser.add_argument('-i', '--dataset-path', type=str,
+    parser.add_argument('-i', '--dataset_path', type=str,
                         default='/home/qiyuan/2021fall/PointNetLK/modelnet10/ModelNet10',
                         help='path to the input dataset')  # like '/path/to/ModelNet40'
     parser.add_argument('-c', '--categoryfile', type=str,

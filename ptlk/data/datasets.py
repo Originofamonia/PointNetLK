@@ -24,6 +24,20 @@ class ModelNet(globset.Globset):
         super().__init__(dataset_path, pattern, loader, transform, classinfo)
 
 
+class Atrial(globset.Globset):
+    """ atrial dataset """
+
+    def __init__(self, dataset_path, train=1, transform=None, classinfo=None):
+        loader = mesh.offread
+        if train > 0:
+            pattern = '6363-Project/Cleaned_PatientData/*.csv'
+        elif train == 0:
+            pattern = '6363-Project/Cleaned_PatientData/*.csv'
+        else:
+            pattern = ['6363-Project/Cleaned_PatientData/*.csv']
+        super().__init__(dataset_path, pattern, loader, transform, classinfo)
+
+
 class ShapeNet2(globset.Globset):
     """ [ShapeNet](https://www.shapenet.org/) v2 """
 

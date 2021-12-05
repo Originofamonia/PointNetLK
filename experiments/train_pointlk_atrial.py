@@ -1,7 +1,6 @@
 """
-    Example for training a tracker (PointNet-LK).
-
-    No-noise version.
+Example for training a tracker (PointNet-LK).
+No-noise version.
 """
 
 import argparse
@@ -20,27 +19,29 @@ import ptlk
 LOGGER = logging.getLogger(__name__)
 LOGGER.addHandler(logging.NullHandler())
 
+os.environ['CUDA_VISIBLE_DEVICES'] = '1'
+
 
 def options(argv=None):
     parser = argparse.ArgumentParser(description='PointNet-LK')
 
     # required.
     parser.add_argument('-o', '--outfile', type=str,
-                        default='/home/qiyuan/2021fall/PointNetLK/outputs/model.pt',
+                        default='/home/qiyuan/2021fall/PointNetLK/outputs/atrial.pt',
                         help='output filename (prefix)')  # the result: ${BASENAME}_model_best.pth
-    parser.add_argument('-i', '--dataset-path', type=str,
+    parser.add_argument('-i', '--dataset_path', type=str,
                         default='/home/qiyuan/2021fall/PointNetLK/6363-Project',
                         help='path to the input dataset')  # like '/path/to/ModelNet40'
     parser.add_argument('-c', '--categoryfile', type=str,
-                        default='/home/qiyuan/2021fall/PointNetLK/6363-Project/label.csv',
+                        # default='/home/qiyuan/2021fall/PointNetLK/6363-Project/label.csv',
                         help='path to the categories to be trained')  # eg. './sampledata/modelnet40_half1.txt'
 
     # settings for input data
-    parser.add_argument('--dataset-type', default='modelnet',
+    parser.add_argument('--dataset_type', default='atrial',
                         choices=['modelnet', 'shapenet2', 'atrial'],
                         metavar='DATASET',
                         help='dataset type (default: modelnet)')
-    parser.add_argument('--num-points', default=1024, type=int,
+    parser.add_argument('--num_points', default=1024, type=int,
                         metavar='N',
                         help='points in point-cloud (default: 1024)')
     parser.add_argument('--mag', default=0.8, type=float,
@@ -51,21 +52,21 @@ def options(argv=None):
     parser.add_argument('--pointnet', default='tune', type=str,
                         choices=['fixed', 'tune'],
                         help='train pointnet (default: tune)')
-    parser.add_argument('--transfer-from', default='', type=str,
+    parser.add_argument('--transfer_from', default='', type=str,
                         metavar='PATH', help='path to pointnet features file')
-    parser.add_argument('--dim-k', default=1024, type=int,
+    parser.add_argument('--dim_k', default=1024, type=int,
                         metavar='K',
                         help='dim. of the feature vector (default: 1024)')
     parser.add_argument('--symfn', default='max', choices=['max', 'avg'],
                         help='symmetric function (default: max)')
 
     # settings for LK
-    parser.add_argument('--max-iter', default=10, type=int,
+    parser.add_argument('--max_iter', default=10, type=int,
                         metavar='N', help='max-iter on LK. (default: 10)')
     parser.add_argument('--delta', default=1.0e-2, type=float,
                         metavar='D',
                         help='step size for approx. Jacobian (default: 1.0e-2)')
-    parser.add_argument('--learn-delta', dest='learn_delta',
+    parser.add_argument('--learn_delta', dest='learn_delta',
                         action='store_true',
                         help='flag for training step size delta')
 
@@ -76,11 +77,11 @@ def options(argv=None):
     parser.add_argument('-j', '--workers', default=4, type=int,
                         metavar='N',
                         help='number of data loading workers (default: 4)')
-    parser.add_argument('-b', '--batch-size', default=32, type=int,
+    parser.add_argument('-b', '--batch_size', default=16, type=int,
                         metavar='N', help='mini-batch size (default: 32)')
-    parser.add_argument('--epochs', default=200, type=int,
+    parser.add_argument('--epochs', default=20, type=int,
                         metavar='N', help='number of total epochs to run')
-    parser.add_argument('--start-epoch', default=0, type=int,
+    parser.add_argument('--start_epoch', default=0, type=int,
                         metavar='N',
                         help='manual epoch number (useful on restarts)')
     parser.add_argument('--optimizer', default='Adam', choices=['Adam', 'SGD'],
@@ -92,7 +93,7 @@ def options(argv=None):
     parser.add_argument('--pretrained', default='', type=str,
                         metavar='PATH',
                         help='path to pretrained model file (default: null (no-use))')
-    parser.add_argument('--device', default='cuda:0', type=str,
+    parser.add_argument('--device', default='cuda', type=str,
                         metavar='DEVICE', help='use CUDA if available')
 
     args = parser.parse_args(argv)
@@ -326,6 +327,29 @@ def get_datasets(args):
         testdata = ptlk.data.datasets.ModelNet(args.dataset_path, train=0,
                                                transform=transform,
                                                classinfo=cinfo)
+
+        mag_randomly = True
+        trainset = ptlk.data.datasets.CADset4tracking(traindata,
+                                                      ptlk.data.transforms.RandomTransformSE3(
+                                                          args.mag,
+                                                          mag_randomly))
+        testset = ptlk.data.datasets.CADset4tracking(testdata,
+                                                     ptlk.data.transforms.RandomTransformSE3(
+                                                         args.mag,
+                                                         mag_randomly))
+    elif args.dataset_type == 'atrial':
+        transform = torchvision.transforms.Compose([
+            ptlk.data.transforms.Mesh2Points(),
+            ptlk.data.transforms.OnUnitCube(),
+            ptlk.data.transforms.Resampler(args.num_points),
+        ])
+
+        traindata = ptlk.data.datasets.Atrial(args.dataset_path, train=1,
+                                              transform=transform,
+                                              classinfo=cinfo)
+        testdata = ptlk.data.datasets.Atrial(args.dataset_path, train=0,
+                                             transform=transform,
+                                             classinfo=cinfo)
 
         mag_randomly = True
         trainset = ptlk.data.datasets.CADset4tracking(traindata,
