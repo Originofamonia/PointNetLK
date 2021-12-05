@@ -141,7 +141,3 @@ class Globset(torch.utils.data.Dataset):
         dataset1.samples = samples1
         dataset2.samples = samples2
         return dataset1, dataset2
-
-
-
-#EOF

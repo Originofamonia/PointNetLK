@@ -12,6 +12,7 @@ from .. import se3
 
 class ModelNet(globset.Globset):
     """ [Princeton ModelNet](http://modelnet.cs.princeton.edu/) """
+
     def __init__(self, dataset_path, train=1, transform=None, classinfo=None):
         loader = mesh.offread
         if train > 0:
@@ -22,8 +23,10 @@ class ModelNet(globset.Globset):
             pattern = ['train/*.off', 'test/*.off']
         super().__init__(dataset_path, pattern, loader, transform, classinfo)
 
+
 class ShapeNet2(globset.Globset):
     """ [ShapeNet](https://www.shapenet.org/) v2 """
+
     def __init__(self, dataset_path, transform=None, classinfo=None):
         loader = mesh.objread
         pattern = '*/models/model_normalized.obj'
@@ -31,7 +34,8 @@ class ShapeNet2(globset.Globset):
 
 
 class CADset4tracking(torch.utils.data.Dataset):
-    def __init__(self, dataset, rigid_transform, source_modifier=None, template_modifier=None):
+    def __init__(self, dataset, rigid_transform, source_modifier=None,
+                 template_modifier=None):
         self.dataset = dataset
         self.rigid_transform = rigid_transform
         self.source_modifier = source_modifier
@@ -81,40 +85,42 @@ class CADset4tracking_fixed_perturbation(torch.utils.data.Dataset):
         x = torch.cat((w, v), dim=1)
         return x.numpy()
 
-    def __init__(self, dataset, perturbation, source_modifier=None, template_modifier=None,
+    def __init__(self, dataset, perturbation, source_modifier=None,
+                 template_modifier=None,
                  fmt_trans=False):
         self.dataset = dataset
-        self.perturbation = numpy.array(perturbation) # twist (len(dataset), 6)
+        self.perturbation = numpy.array(perturbation)  # twist (len(dataset), 6)
         self.source_modifier = source_modifier
         self.template_modifier = template_modifier
-        self.fmt_trans = fmt_trans # twist or (rotation and translation)
+        self.fmt_trans = fmt_trans  # twist or (rotation and translation)
 
     def do_transform(self, p0, x):
         # p0: [N, 3]
         # x: [1, 6]
         if not self.fmt_trans:
             # x: twist-vector
-            g = se3.exp(x).to(p0) # [1, 4, 4]
+            g = se3.exp(x).to(p0)  # [1, 4, 4]
             p1 = se3.transform(g, p0)
-            igt = g.squeeze(0) # igt: p0 -> p1
+            igt = g.squeeze(0)  # igt: p0 -> p1
         else:
             # x: rotation and translation
             w = x[:, 0:3]
             q = x[:, 3:6]
-            R = so3.exp(w).to(p0) # [1, 3, 3]
+            R = so3.exp(w).to(p0)  # [1, 3, 3]
             g = torch.zeros(1, 4, 4)
             g[:, 3, 3] = 1
-            g[:, 0:3, 0:3] = R # rotation
-            g[:, 0:3, 3] = q   # translation
+            g[:, 0:3, 0:3] = R  # rotation
+            g[:, 0:3, 3] = q  # translation
             p1 = se3.transform(g, p0)
-            igt = g.squeeze(0) # igt: p0 -> p1
+            igt = g.squeeze(0)  # igt: p0 -> p1
         return p1, igt
 
     def __len__(self):
         return len(self.dataset)
 
     def __getitem__(self, index):
-        twist = torch.from_numpy(numpy.array(self.perturbation[index])).contiguous().view(1, 6)
+        twist = torch.from_numpy(
+            numpy.array(self.perturbation[index])).contiguous().view(1, 6)
         pm, _ = self.dataset[index]
         x = twist.to(pm)
         if self.source_modifier is not None:
@@ -131,6 +137,4 @@ class CADset4tracking_fixed_perturbation(torch.utils.data.Dataset):
         # p0: template, p1: source, igt: transform matrix from p0 to p1
         return p0, p1, igt
 
-
-
-#EOF
+# EOF

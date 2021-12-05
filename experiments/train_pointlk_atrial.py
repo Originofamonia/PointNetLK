@@ -26,13 +26,13 @@ def options(argv=None):
 
     # required.
     parser.add_argument('-o', '--outfile', type=str,
-                        default='/home/qiyuan/2021fall/PointNetLK/outputs/modelnet.pt',
+                        default='/home/qiyuan/2021fall/PointNetLK/outputs/model.pt',
                         help='output filename (prefix)')  # the result: ${BASENAME}_model_best.pth
     parser.add_argument('-i', '--dataset-path', type=str,
-                        default='/home/qiyuan/2021fall/PointNetLK/modelnet10/ModelNet10',
+                        default='/home/qiyuan/2021fall/PointNetLK/6363-Project',
                         help='path to the input dataset')  # like '/path/to/ModelNet40'
     parser.add_argument('-c', '--categoryfile', type=str,
-                        default='/home/qiyuan/2021fall/PointNetLK/modelnet10/ModelNet10',
+                        default='/home/qiyuan/2021fall/PointNetLK/6363-Project/label.csv',
                         help='path to the categories to be trained')  # eg. './sampledata/modelnet40_half1.txt'
 
     # settings for input data
