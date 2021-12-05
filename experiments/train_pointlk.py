@@ -37,7 +37,7 @@ def options(argv=None):
                         help='path to the categories to be trained')  # eg. './sampledata/modelnet40_half1.txt'
 
     # settings for input data
-    parser.add_argument('--dataset-type', default='atrial',
+    parser.add_argument('--dataset-type', default='modelnet',
                         choices=['modelnet', 'shapenet2', 'atrial'],
                         metavar='DATASET',
                         help='dataset type (default: modelnet)')
