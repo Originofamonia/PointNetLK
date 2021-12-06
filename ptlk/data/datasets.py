@@ -1,8 +1,10 @@
 """ datasets """
+import os
 
 import numpy
 import torch
 import torch.utils.data
+from torch.utils.data import Dataset
 
 from . import globset
 from . import mesh
@@ -24,18 +26,16 @@ class ModelNet(globset.Globset):
         super().__init__(dataset_path, pattern, loader, transform, classinfo)
 
 
-class Atrial(globset.Globset):
+class Atrial(Dataset):
     """ atrial dataset """
 
     def __init__(self, dataset_path, train=1, transform=None, classinfo=None):
         loader = mesh.offread
-        if train > 0:
-            pattern = '/Cleaned_PatientData/*.csv'
-        elif train == 0:
-            pattern = '/Cleaned_PatientData/*.csv'
-        else:
-            pattern = ['/Cleaned_PatientData/*.csv']
-        super().__init__(dataset_path, pattern, loader, transform, classinfo)
+        self.all_examples = self.get_all_examples(dataset_path)
+
+    def get_all_examples(self, dataset_path):
+        all_dirs = os.listdir(dataset_path)
+        return all_dirs
 
 
 class ShapeNet2(globset.Globset):
