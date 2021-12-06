@@ -271,7 +271,7 @@ class Action:
                                             self.p1_zero_mean)
         # r = model(p0, p1, self.max_iter)
         est_g = model.g  # [b, 4, 4]
-        self.plot_pointcloud(est_g, p0, p1)
+        self.plot_pointcloud(est_g[0], p0[0], p1[0])
 
         loss_g = ptlk.pointlk.PointLK.comp(est_g, igt)
 
@@ -297,7 +297,7 @@ class Action:
         p1_4 = torch.zeros(len(p1[0]))
         p1_cat = torch.cat((p1, p1_4), dim=-1)
         p0 = p0.detach().cpu().numpy()
-        p1_rotated = torch.bmm(p1_cat, est_g)
+        p1_rotated = torch.matmul(p1_cat, est_g)
         p1_rotated = p1_rotated.detach().cpu().numpy()
 
         fig = plt.figure(figsize=(8, 8))
