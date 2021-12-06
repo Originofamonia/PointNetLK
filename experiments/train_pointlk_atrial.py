@@ -294,7 +294,7 @@ class Action:
         return loss, loss_g
 
     def plot_pointcloud(self, est_g, p0, p1):
-        p1_4 = torch.zeros(len(p1[0]))
+        p1_4 = torch.zeros(len(p1))
         p1_cat = torch.cat((p1, p1_4), dim=-1)
         p0 = p0.detach().cpu().numpy()
         p1_rotated = torch.matmul(p1_cat, est_g)
