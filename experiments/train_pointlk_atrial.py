@@ -41,11 +41,9 @@ def options(argv=None):
                         choices=['modelnet', 'shapenet2', 'atrial'],
                         metavar='DATASET',
                         help='dataset type (default: modelnet)')
-    parser.add_argument('--num_points', default=1024, type=int,
-                        metavar='N',
+    parser.add_argument('--num_points', default=1024, type=int, metavar='N',
                         help='points in point-cloud (default: 1024)')
-    parser.add_argument('--mag', default=0.8, type=float,
-                        metavar='T',
+    parser.add_argument('--mag', default=0.8, type=float, metavar='T',
                         help='max. mag. of twist-vectors (perturbations) on training (default: 0.8)')
 
     # settings for PointNet
@@ -54,8 +52,7 @@ def options(argv=None):
                         help='train pointnet (default: tune)')
     parser.add_argument('--transfer_from', default='', type=str,
                         metavar='PATH', help='path to pointnet features file')
-    parser.add_argument('--dim_k', default=1024, type=int,
-                        metavar='K',
+    parser.add_argument('--dim_k', default=1024, type=int, metavar='K',
                         help='dim. of the feature vector (default: 1024)')
     parser.add_argument('--symfn', default='max', choices=['max', 'avg'],
                         help='symmetric function (default: max)')
@@ -63,8 +60,7 @@ def options(argv=None):
     # settings for LK
     parser.add_argument('--max_iter', default=10, type=int,
                         metavar='N', help='max-iter on LK. (default: 10)')
-    parser.add_argument('--delta', default=1.0e-2, type=float,
-                        metavar='D',
+    parser.add_argument('--delta', default=1.0e-2, type=float, metavar='D',
                         help='step size for approx. Jacobian (default: 1.0e-2)')
     parser.add_argument('--learn_delta', dest='learn_delta',
                         action='store_true',
@@ -77,18 +73,16 @@ def options(argv=None):
     parser.add_argument('-j', '--workers', default=4, type=int,
                         metavar='N',
                         help='number of data loading workers (default: 4)')
-    parser.add_argument('-b', '--batch_size', default=16, type=int,
+    parser.add_argument('-b', '--batch_size', default=1, type=int,
                         metavar='N', help='mini-batch size (default: 32)')
     parser.add_argument('--epochs', default=20, type=int,
                         metavar='N', help='number of total epochs to run')
-    parser.add_argument('--start_epoch', default=0, type=int,
-                        metavar='N',
+    parser.add_argument('--start_epoch', default=0, type=int, metavar='N',
                         help='manual epoch number (useful on restarts)')
     parser.add_argument('--optimizer', default='Adam', choices=['Adam', 'SGD'],
                         metavar='METHOD',
                         help='name of an optimizer (default: Adam)')
-    parser.add_argument('--resume', default='', type=str,
-                        metavar='PATH',
+    parser.add_argument('--resume', default='', type=str, metavar='PATH',
                         help='path to latest checkpoint (default: null (no-use))')
     parser.add_argument('--pretrained', default='', type=str,
                         metavar='PATH',
@@ -307,80 +301,26 @@ class ShapeNet2_transform_coordinate:
 
 def get_datasets(args):
     cinfo = None
-    if args.categoryfile:
-        # categories = numpy.loadtxt(args.categoryfile, dtype=str, delimiter="\n").tolist()
-        categories = [line.rstrip('\n') for line in open(args.categoryfile)]
-        categories.sort()
-        c_to_idx = {categories[i]: i for i in range(len(categories))}
-        cinfo = (categories, c_to_idx)
+    transform = torchvision.transforms.Compose([
+        ptlk.data.transforms.Mesh2Points(),
+        ptlk.data.transforms.OnUnitCube(),
+        ptlk.data.transforms.Resampler(args.num_points),
+    ])
 
-    if args.dataset_type == 'modelnet':
-        transform = torchvision.transforms.Compose([
-            ptlk.data.transforms.Mesh2Points(),
-            ptlk.data.transforms.OnUnitCube(),
-            ptlk.data.transforms.Resampler(args.num_points),
-        ])
+    traindata = ptlk.data.datasets.Atrial(args.dataset_path, is_train=True,
+                                          transform=transform)
+    testdata = ptlk.data.datasets.Atrial(args.dataset_path, is_train=False,
+                                         transform=transform)
 
-        traindata = ptlk.data.datasets.ModelNet(args.dataset_path, train=1,
-                                                transform=transform,
-                                                classinfo=cinfo)
-        testdata = ptlk.data.datasets.ModelNet(args.dataset_path, train=0,
-                                               transform=transform,
-                                               classinfo=cinfo)
-
-        mag_randomly = True
-        trainset = ptlk.data.datasets.CADset4tracking(traindata,
-                                                      ptlk.data.transforms.RandomTransformSE3(
-                                                          args.mag,
-                                                          mag_randomly))
-        testset = ptlk.data.datasets.CADset4tracking(testdata,
-                                                     ptlk.data.transforms.RandomTransformSE3(
-                                                         args.mag,
-                                                         mag_randomly))
-    elif args.dataset_type == 'atrial':
-        transform = torchvision.transforms.Compose([
-            ptlk.data.transforms.Mesh2Points(),
-            ptlk.data.transforms.OnUnitCube(),
-            ptlk.data.transforms.Resampler(args.num_points),
-        ])
-
-        traindata = ptlk.data.datasets.Atrial(args.dataset_path, is_train=True,
-                                              transform=transform)
-        testdata = ptlk.data.datasets.Atrial(args.dataset_path, is_train=False,
-                                             transform=transform)
-
-        mag_randomly = True
-        trainset = ptlk.data.datasets.CADset4tracking(traindata,
-                                                      ptlk.data.transforms.RandomTransformSE3(
-                                                          args.mag,
-                                                          mag_randomly))
-        testset = ptlk.data.datasets.CADset4tracking(testdata,
-                                                     ptlk.data.transforms.RandomTransformSE3(
-                                                         args.mag,
-                                                         mag_randomly))
-
-    elif args.dataset_type == 'shapenet2':
-        transform = torchvision.transforms.Compose([
-            ShapeNet2_transform_coordinate(),
-            ptlk.data.transforms.Mesh2Points(),
-            ptlk.data.transforms.OnUnitCube(),
-            ptlk.data.transforms.Resampler(args.num_points),
-        ])
-
-        dataset = ptlk.data.datasets.ShapeNet2(args.dataset_path,
-                                               transform=transform,
-                                               classinfo=cinfo)
-        traindata, testdata = dataset.split(0.8)
-
-        mag_randomly = True
-        trainset = ptlk.data.datasets.CADset4tracking(traindata,
-                                                      ptlk.data.transforms.RandomTransformSE3(
-                                                          args.mag,
-                                                          mag_randomly))
-        testset = ptlk.data.datasets.CADset4tracking(testdata,
-                                                     ptlk.data.transforms.RandomTransformSE3(
-                                                         args.mag,
-                                                         mag_randomly))
+    mag_randomly = True
+    trainset = ptlk.data.datasets.CADset4tracking(traindata,
+                                                  ptlk.data.transforms.RandomTransformSE3(
+                                                      args.mag,
+                                                      mag_randomly))
+    testset = ptlk.data.datasets.CADset4tracking(testdata,
+                                                 ptlk.data.transforms.RandomTransformSE3(
+                                                     args.mag,
+                                                     mag_randomly))
 
     return trainset, testset
 
