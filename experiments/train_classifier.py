@@ -31,8 +31,8 @@ def options(argv=None):
     parser.add_argument('-o', '--outfile', required=True, type=str,
                         metavar='BASENAME',
                         help='output filename (prefix)')  # result: ${BASENAME}_feat_best.pth
-    parser.add_argument('-i', '--dataset-path', required=True, type=str,
-                        metavar='PATH',
+    parser.add_argument('-i', '--dataset_path', required=True, type=str,
+                        default='/home/qiyuan/2021fall/PointNetLK/modelnet10/ModelNet10',
                         help='path to the input dataset')  # like '/path/to/ModelNet40'
     parser.add_argument('-c', '--categoryfile', required=True, type=str,
                         metavar='PATH',

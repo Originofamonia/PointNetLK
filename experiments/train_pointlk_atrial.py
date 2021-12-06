@@ -268,7 +268,7 @@ class Action:
                                             self.p0_zero_mean,
                                             self.p1_zero_mean)
         # r = model(p0, p1, self.max_iter)
-        est_g = model.g
+        est_g = model.g  # [b, 4, 4]
 
         loss_g = ptlk.pointlk.PointLK.comp(est_g, igt)
 
