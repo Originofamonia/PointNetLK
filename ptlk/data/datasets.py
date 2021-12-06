@@ -35,13 +35,15 @@ class Atrial(Dataset):
         self.all_examples, self.dirs = self.get_all_examples(dataset_path)
         labels_df = pd.read_csv(f'{dataset_path}/label.csv')
         filtered_df = labels_df[labels_df['Study number'].isin(self.dirs)]
-        print(filtered_df)
+        self.study_ids = filtered_df['Study number'].values
+        self.af_labels = filtered_df['AF type'].values
+        self.re_af_labels = filtered_df['1Y re AF'].values
+        print(self.re_af_labels)
 
     def __getitem__(self, idx):
         path = self.all_examples[idx]
         study_id = path.split('/')[-2]
         df = pd.read_csv(path)
-
 
 
     def get_all_examples(self, dataset_path):
