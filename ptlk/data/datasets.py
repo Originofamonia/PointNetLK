@@ -35,7 +35,8 @@ class Atrial(Dataset):
 
     def get_all_examples(self, dataset_path):
         all_dirs = os.listdir(dataset_path)
-        return all_dirs
+        all_example_paths = [f'{dataset_path}/{d}/{d}_eam_data.csv' for d in all_dirs]
+        return all_example_paths
 
 
 class ShapeNet2(globset.Globset):
