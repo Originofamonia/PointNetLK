@@ -295,17 +295,17 @@ class Action:
         return loss, loss_g
 
     def plot_pointcloud(self, est_g, p0, p1):
-        p1_4 = torch.zeros(len(p1)).unsqueeze(1).to(p1)
-        p1_cat = torch.cat((p1, p1_4), dim=-1)
-        p0 = p0.detach().cpu().numpy()
-        p1_rotated = torch.matmul(p1_cat, est_g)
-        p1_rotated = p1_rotated.detach().cpu().numpy()
+        p0_4 = torch.zeros(len(p0)).unsqueeze(1).to(p1)
+        p0_cat = torch.cat((p0, p0_4), dim=-1)
+        # p0 = p0.detach().cpu().numpy()
+        p0_rotated = torch.matmul(p0_cat, est_g)
+        p0_rotated = p0_rotated.detach().cpu().numpy()
 
         fig = plt.figure(figsize=(8, 8))
         ax = fig.add_subplot(111, projection='3d')
 
-        ax.scatter(p0[:, 0], p0[:, 1], p0[:, 2], c='b')
-        ax.scatter(p1_rotated[:, 0], p1_rotated[:, 1], p1_rotated[:, 2], c='r')
+        ax.scatter(p1[:, 0], p1[:, 1], p1[:, 2], c='b')
+        ax.scatter(p0_rotated[:, 0], p0_rotated[:, 1], p0_rotated[:, 2], c='r')
         plt.savefig('pt.jpg')
 
 
