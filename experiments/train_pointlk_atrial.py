@@ -344,12 +344,10 @@ def get_datasets(args):
             ptlk.data.transforms.Resampler(args.num_points),
         ])
 
-        traindata = ptlk.data.datasets.Atrial(args.dataset_path, train=1,
-                                              transform=transform,
-                                              classinfo=cinfo)
-        testdata = ptlk.data.datasets.Atrial(args.dataset_path, train=0,
-                                             transform=transform,
-                                             classinfo=cinfo)
+        traindata = ptlk.data.datasets.Atrial(args.dataset_path, is_train=True,
+                                              transform=transform)
+        testdata = ptlk.data.datasets.Atrial(args.dataset_path, is_train=False,
+                                             transform=transform)
 
         mag_randomly = True
         trainset = ptlk.data.datasets.CADset4tracking(traindata,

@@ -30,20 +30,28 @@ class ModelNet(globset.Globset):
 class Atrial(Dataset):
     """ atrial dataset """
 
-    def __init__(self, dataset_path, train=1, transform=None, classinfo=None):
+    def __init__(self, dataset_path, is_train=True, transform=None):
         loader = mesh.offread
+        self.dataset_path = dataset_path
+        self.transform = transform
         self.all_examples, self.dirs = self.get_all_examples(dataset_path)
         labels_df = pd.read_csv(f'{dataset_path}/label.csv')
         filtered_df = labels_df[labels_df['Study number'].isin(self.dirs)]
-        self.study_ids = filtered_df['Study number'].values
-        self.af_labels = filtered_df['AF type'].values
-        self.re_af_labels = filtered_df['1Y re AF'].values
-        print(self.re_af_labels)
+        self.template_id = 0  # select 0 as the template
+        if is_train:
+            self.study_ids = filtered_df['Study number'].values[1:5]
+            self.af_labels = filtered_df['AF type'].values[1:5]
+            self.re_af_labels = filtered_df['1Y re AF'].values[1:5]
+        else:
+            self.study_ids = filtered_df['Study number'].values[5:]
+            self.af_labels = filtered_df['AF type'].values[5:]
+            self.re_af_labels = filtered_df['1Y re AF'].values[5:]
 
     def __getitem__(self, idx):
-        path = self.all_examples[idx]
-        study_id = path.split('/')[-2]
+        study_id = self.study_ids[idx]
+        path = f'{self.dataset_path}/Cleaned_PatientData/{study_id}/{study_id}_eam_data.csv'
         df = pd.read_csv(path)
+        print(df)
 
 
     def get_all_examples(self, dataset_path):
