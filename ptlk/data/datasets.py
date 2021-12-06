@@ -45,7 +45,7 @@ class Atrial(Dataset):
 
 
     def get_all_examples(self, dataset_path):
-        all_dirs = os.listdir(dataset_path)
+        all_dirs = os.listdir(f'{dataset_path}/Cleaned_PatientData')
         all_example_paths = [f'{dataset_path}/Cleaned_PatientData/{d}/{d}_eam_data.csv' for d in all_dirs]
         return all_example_paths, all_dirs
 
