@@ -72,6 +72,35 @@ class Atrial(Dataset):
         return all_example_paths, all_dirs
 
 
+class AtrialTransform(Dataset):
+    def __init__(self, dataset, rigid_transform, source_modifier=None,
+                 template_modifier=None):
+        self.dataset = dataset
+        self.rigid_transform = rigid_transform
+        self.source_modifier = source_modifier
+        self.template_modifier = template_modifier
+
+    def __len__(self):
+        return len(self.dataset)
+
+    def __getitem__(self, index):
+        pm, _, _, _, _ = self.dataset[index]
+        if self.source_modifier is not None:
+            p_ = self.source_modifier(pm)
+            p1 = self.rigid_transform(p_)
+        else:
+            p1 = self.rigid_transform(pm)
+        igt = self.rigid_transform.igt
+
+        if self.template_modifier is not None:
+            p0 = self.template_modifier(pm)
+        else:
+            p0 = pm
+
+        # p0: template, p1: source, igt: transform matrix from p0 to p1
+        return p0, p1, igt
+
+
 class ShapeNet2(globset.Globset):
     """ [ShapeNet](https://www.shapenet.org/) v2 """
 
@@ -110,7 +139,7 @@ class CADset4tracking(torch.utils.data.Dataset):
         return p0, p1, igt
 
 
-class CADset4tracking_fixed_perturbation(torch.utils.data.Dataset):
+class CADset4tracking_fixed_perturbation(Dataset):
     @staticmethod
     def generate_perturbations(batch_size, mag, randomly=False):
         if randomly:

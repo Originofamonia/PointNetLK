@@ -264,7 +264,7 @@ class Action:
         p1 = p1.to(device)  # source
         igt = igt.to(device)  # igt: p0 -> p1
         r = ptlk.pointlk.PointLK.do_forward(model, p0, p1, self.max_iter,
-                                            self.xtol, \
+                                            self.xtol,
                                             self.p0_zero_mean,
                                             self.p1_zero_mean)
         # r = model(p0, p1, self.max_iter)
@@ -313,11 +313,11 @@ def get_datasets(args):
                                          transform=transform)
 
     mag_randomly = True
-    trainset = ptlk.data.datasets.CADset4tracking(traindata,
+    trainset = ptlk.data.datasets.AtrialTransform(traindata,
                                                   ptlk.data.transforms.RandomTransformSE3(
                                                       args.mag,
                                                       mag_randomly))
-    testset = ptlk.data.datasets.CADset4tracking(testdata,
+    testset = ptlk.data.datasets.AtrialTransform(testdata,
                                                  ptlk.data.transforms.RandomTransformSE3(
                                                      args.mag,
                                                      mag_randomly))
