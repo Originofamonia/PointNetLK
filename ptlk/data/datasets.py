@@ -34,6 +34,7 @@ class Atrial(Dataset):
         loader = mesh.offread
         self.dataset_path = dataset_path
         self.transform = transform
+        self.is_train = is_train
         self.all_examples, self.dirs = self.get_all_examples(dataset_path)
         labels_df = pd.read_csv(f'{dataset_path}/label.csv')
         filtered_df = labels_df[labels_df['Study number'].isin(self.dirs)]
@@ -53,6 +54,8 @@ class Atrial(Dataset):
         df = pd.read_csv(path)
         print(df)
 
+    def __len__(self):
+        return len(self.study_ids)
 
     def get_all_examples(self, dataset_path):
         all_dirs = os.listdir(f'{dataset_path}/Cleaned_PatientData')
