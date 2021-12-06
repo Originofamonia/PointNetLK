@@ -34,7 +34,8 @@ class Atrial(Dataset):
         loader = mesh.offread
         self.all_examples, self.dirs = self.get_all_examples(dataset_path)
         labels_df = pd.read_csv(f'{dataset_path}/label.csv')
-        print(labels_df)
+        filtered_df = labels_df[labels_df['Study number'].isin(self.dirs)]
+        print(filtered_df)
 
     def __getitem__(self, idx):
         path = self.all_examples[idx]
