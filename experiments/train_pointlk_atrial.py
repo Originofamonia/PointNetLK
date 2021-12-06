@@ -304,7 +304,7 @@ class Action:
         ax = fig.add_subplot(111, projection='3d')
 
         ax.scatter(p0[:, 0], p0[:, 1], p0[:, 2], c='b')
-        ax.scatter(p1_rotated[:, 0], p1_rotated[:, 1], p1_rotated[:, 2], c='w')
+        ax.scatter(p1_rotated[:, 0], p1_rotated[:, 1], p1_rotated[:, 2], c='r')
         plt.savefig('pt.jpg')
 
 
