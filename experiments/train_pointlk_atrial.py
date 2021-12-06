@@ -149,8 +149,8 @@ def run(args, trainset, testset, action):
     for epoch in range(args.start_epoch, args.epochs):
         # scheduler.step()
 
-        running_loss, running_info = action.train_1(model, trainloader,
-                                                    optimizer, args.device)
+        running_loss, running_info = action.train_1(args, model, trainloader,
+                                                    optimizer, epoch)
         val_loss, val_info = action.eval_1(model, testloader, args.device)
 
         is_best = val_loss < min_loss
@@ -218,13 +218,13 @@ class Action:
     def create_from_pointnet_features(self, ptnet):
         return ptlk.pointlk.PointLK(ptnet, self.delta, self.learn_delta)
 
-    def train_1(self, model, trainloader, optimizer, device):
+    def train_1(self, args, model, trainloader, optimizer, epoch):
         model.train()
         vloss = 0.0
         gloss = 0.0
         count = 0
         for i, data in enumerate(trainloader):
-            loss, loss_g = self.compute_loss(model, data, device)
+            loss, loss_g = self.compute_loss(args, model, data, epoch)
 
             # forward + backward + optimize
             optimizer.zero_grad()
@@ -248,7 +248,7 @@ class Action:
         count = 0
         with torch.no_grad():
             for i, data in enumerate(testloader):
-                loss, loss_g = self.compute_loss(model, data, device)
+                loss, loss_g = self.compute_loss(args, model, data, device)
 
                 vloss1 = loss.item()
                 vloss += vloss1
@@ -260,18 +260,19 @@ class Action:
         ave_gloss = float(gloss) / count
         return ave_vloss, ave_gloss
 
-    def compute_loss(self, model, data, device):
+    def compute_loss(self, args, model, data, epoch):
         p0, p1, igt = data
-        p0 = p0.to(device)  # template
-        p1 = p1.to(device)  # source
-        igt = igt.to(device)  # igt: p0 -> p1
+        p0 = p0.to(args.device)  # template
+        p1 = p1.to(args.device)  # source
+        igt = igt.to(args.device)  # igt: p0 -> p1
         r = ptlk.pointlk.PointLK.do_forward(model, p0, p1, self.max_iter,
                                             self.xtol,
                                             self.p0_zero_mean,
                                             self.p1_zero_mean)
         # r = model(p0, p1, self.max_iter)
         est_g = model.g  # [b, 4, 4]
-        self.plot_pointcloud(est_g[0], p0[0], p1[0])
+        if epoch == args.epochs - 1:
+            self.plot_pointcloud(est_g[0], p0[0], p1[0])
 
         loss_g = ptlk.pointlk.PointLK.comp(est_g, igt)
 
