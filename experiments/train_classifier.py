@@ -237,7 +237,7 @@ class Action:
 
     def compute_loss(self, model, data, device):
         points, target = data
-
+        # points: [32, 1024, 3], target: [32]
         points = points.to(device)
         target = target.to(device)
 
@@ -265,13 +265,13 @@ def get_datasets(args):
         cinfo = (categories, c_to_idx)
 
     if args.dataset_type == 'modelnet':
-        transform = torchvision.transforms.Compose([ \
-            ptlk.data.transforms.Mesh2Points(), \
-            ptlk.data.transforms.OnUnitCube(), \
-            ptlk.data.transforms.Resampler(args.num_points), \
-            ptlk.data.transforms.RandomRotatorZ(), \
-            ptlk.data.transforms.RandomJitter() \
-            ])
+        transform = torchvision.transforms.Compose([
+            ptlk.data.transforms.Mesh2Points(),
+            ptlk.data.transforms.OnUnitCube(),
+            ptlk.data.transforms.Resampler(args.num_points),
+            ptlk.data.transforms.RandomRotatorZ(),
+            ptlk.data.transforms.RandomJitter()
+        ])
 
         trainset = ptlk.data.datasets.ModelNet(args.dataset_path, train=1,
                                                transform=transform,
@@ -281,14 +281,14 @@ def get_datasets(args):
                                               classinfo=cinfo)
 
     elif args.dataset_type == 'shapenet2':
-        transform = torchvision.transforms.Compose([ \
-            ShapeNet2_transform_coordinate(), \
-            ptlk.data.transforms.Mesh2Points(), \
-            ptlk.data.transforms.OnUnitCube(), \
-            ptlk.data.transforms.Resampler(args.num_points), \
-            ptlk.data.transforms.RandomRotatorZ(), \
-            ptlk.data.transforms.RandomJitter() \
-            ])
+        transform = torchvision.transforms.Compose([
+            ShapeNet2_transform_coordinate(),
+            ptlk.data.transforms.Mesh2Points(),
+            ptlk.data.transforms.OnUnitCube(),
+            ptlk.data.transforms.Resampler(args.num_points),
+            ptlk.data.transforms.RandomRotatorZ(),
+            ptlk.data.transforms.RandomJitter()
+        ])
 
         dataset = ptlk.data.datasets.ShapeNet2(args.dataset_path,
                                                transform=transform,
@@ -309,5 +309,3 @@ if __name__ == '__main__':
 
     main(ARGS)
     LOGGER.debug('done (PID=%d)', os.getpid())
-
-# EOF

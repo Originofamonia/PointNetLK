@@ -206,5 +206,3 @@ class PointLK(torch.nn.Module):
 
         self.ptnet.train(training)
         return r, g, (itr + 1)
-
-# EOF

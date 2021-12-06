@@ -125,7 +125,7 @@ class PointNet_features(torch.nn.Module):
         self.t_out_h1 = None
 
     def forward(self, points):
-        """ points -> features
+        """ points -> features, phi() in paper
             [B, N, 3] -> [B, K]
         """
         x = points.transpose(1, 2)  # [B, 3, N]

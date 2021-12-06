@@ -206,9 +206,10 @@ class Action:
         if self.transfer_from and os.path.isfile(self.transfer_from):
             ptnet.load_state_dict(
                 torch.load(self.transfer_from, map_location='cpu'))
-        if self.pointnet == 'tune':
-            pass
-        elif self.pointnet == 'fixed':
+        # if self.pointnet == 'tune':
+        #     pass
+        # el
+        if self.pointnet == 'fixed':
             for param in ptnet.parameters():
                 param.requires_grad_(False)
         return ptnet
