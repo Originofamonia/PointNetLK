@@ -30,11 +30,11 @@ class Atrial(globset.Globset):
     def __init__(self, dataset_path, train=1, transform=None, classinfo=None):
         loader = mesh.offread
         if train > 0:
-            pattern = '6363-Project/Cleaned_PatientData/*.csv'
+            pattern = '/Cleaned_PatientData/*.csv'
         elif train == 0:
-            pattern = '6363-Project/Cleaned_PatientData/*.csv'
+            pattern = '/Cleaned_PatientData/*.csv'
         else:
-            pattern = ['6363-Project/Cleaned_PatientData/*.csv']
+            pattern = ['/Cleaned_PatientData/*.csv']
         super().__init__(dataset_path, pattern, loader, transform, classinfo)
 
 
