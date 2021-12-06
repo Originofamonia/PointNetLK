@@ -52,15 +52,15 @@ class Atrial(Dataset):
         study_id = self.study_ids[idx]
         path = f'{self.dataset_path}/Cleaned_PatientData/{study_id}/{study_id}_eam_data.csv'
         df = pd.read_csv(path)
-        points = np.float32(df[['x_norm', 'y_norm', 'z_norm']].values)
+        points = torch.from_numpy(np.float32(df[['x_norm', 'y_norm', 'z_norm']].values))
         # if self.transform:
         #     points = self.transform(points)
 
-        unipolar = df['unipolar'].values
-        bipolar = df['unipolar'].values
+        unipolar = torch.from_numpy(df['unipolar'].values)
+        bipolar = torch.from_numpy(df['unipolar'].values)
 
-        af_type = self.af_labels[idx]
-        re_af_type = self.re_af_labels[idx]
+        af_type = torch.from_numpy(self.af_labels[idx])
+        re_af_type = torch.from_numpy(self.re_af_labels[idx])
         return points, unipolar, bipolar, af_type, re_af_type
 
     def __len__(self):
