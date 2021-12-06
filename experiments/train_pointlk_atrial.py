@@ -11,6 +11,7 @@ import numpy
 import torch
 import torch.utils.data
 import torchvision
+import matplotlib.pyplot as plt
 
 sys.path.insert(0, os.path.abspath(
     os.path.join(os.path.dirname(__file__), os.pardir)))
@@ -270,6 +271,7 @@ class Action:
                                             self.p1_zero_mean)
         # r = model(p0, p1, self.max_iter)
         est_g = model.g  # [b, 4, 4]
+        self.plot_pointcloud(est_g, p0, p1)
 
         loss_g = ptlk.pointlk.PointLK.comp(est_g, igt)
 
@@ -290,6 +292,20 @@ class Action:
             loss = loss_g
 
         return loss, loss_g
+
+    def plot_pointcloud(self, est_g, p0, p1):
+        p1_4 = torch.zeros(len(p1[0]))
+        p1_cat = torch.cat((p1, p1_4), dim=-1)
+        p0 = p0.detach().cpu().numpy()
+        p1_rotated = torch.bmm(p1_cat, est_g)
+        p1_rotated = p1_rotated.detach().cpu().numpy()
+
+        fig = plt.figure(figsize=(8, 8))
+        ax = fig.add_subplot(111, projection='3d')
+
+        ax.scatter(p0[:, 0], p0[:, 1], p0[:, 2], c='b')
+        ax.scatter(p1_rotated[:, 0], p1_rotated[:, 1], p1_rotated[:, 2], c='w')
+        plt.savefig('pt.jpg')
 
 
 class ShapeNet2_transform_coordinate:
