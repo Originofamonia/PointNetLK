@@ -59,8 +59,8 @@ class Atrial(Dataset):
         unipolar = torch.from_numpy(df['unipolar'].values)
         bipolar = torch.from_numpy(df['unipolar'].values)
 
-        af_type = torch.from_numpy(self.af_labels[idx])
-        re_af_type = torch.from_numpy(self.re_af_labels[idx])
+        af_type = torch.from_numpy(np.asarray(self.af_labels[idx]))
+        re_af_type = torch.from_numpy(np.asarray(self.re_af_labels[idx]))
         return points, unipolar, bipolar, af_type, re_af_type
 
     def __len__(self):
