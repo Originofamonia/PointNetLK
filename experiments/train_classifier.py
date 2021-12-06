@@ -28,13 +28,13 @@ def options(argv=None):
     parser = argparse.ArgumentParser(description='PointNet classifier')
 
     # required.
-    parser.add_argument('-o', '--outfile', required=True, type=str,
+    parser.add_argument('-o', '--outfile', type=str,
                         metavar='BASENAME',
                         help='output filename (prefix)')  # result: ${BASENAME}_feat_best.pth
-    parser.add_argument('-i', '--dataset_path', required=True, type=str,
+    parser.add_argument('-i', '--dataset_path', type=str,
                         default='/home/qiyuan/2021fall/PointNetLK/modelnet10/ModelNet10',
                         help='path to the input dataset')  # like '/path/to/ModelNet40'
-    parser.add_argument('-c', '--categoryfile', required=True, type=str,
+    parser.add_argument('-c', '--categoryfile', type=str,
                         metavar='PATH',
                         help='path to the categories to be trained')  # eg. './sampledata/modelnet40_half1.txt'
 
