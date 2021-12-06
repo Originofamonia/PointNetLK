@@ -53,8 +53,8 @@ class Atrial(Dataset):
         path = f'{self.dataset_path}/Cleaned_PatientData/{study_id}/{study_id}_eam_data.csv'
         df = pd.read_csv(path)
         points = np.float32(df[['x_norm', 'y_norm', 'z_norm']].values)
-        if self.transform:
-            points = self.transform(points)
+        # if self.transform:
+        #     points = self.transform(points)
 
         unipolar = df['unipolar'].values
         bipolar = df['unipolar'].values
