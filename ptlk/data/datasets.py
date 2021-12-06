@@ -3,6 +3,7 @@ import os
 
 import numpy
 import torch
+import pandas as pd
 import torch.utils.data
 from torch.utils.data import Dataset
 
@@ -31,12 +32,21 @@ class Atrial(Dataset):
 
     def __init__(self, dataset_path, train=1, transform=None, classinfo=None):
         loader = mesh.offread
-        self.all_examples = self.get_all_examples(dataset_path)
+        self.all_examples, self.dirs = self.get_all_examples(dataset_path)
+        labels_df = pd.read_csv(f'{dataset_path}/label.csv')
+        print(labels_df)
+
+    def __getitem__(self, idx):
+        path = self.all_examples[idx]
+        study_id = path.split('/')[-2]
+        df = pd.read_csv(path)
+
+
 
     def get_all_examples(self, dataset_path):
         all_dirs = os.listdir(dataset_path)
-        all_example_paths = [f'{dataset_path}/{d}/{d}_eam_data.csv' for d in all_dirs]
-        return all_example_paths
+        all_example_paths = [f'{dataset_path}/Cleaned_PatientData/{d}/{d}_eam_data.csv' for d in all_dirs]
+        return all_example_paths, all_dirs
 
 
 class ShapeNet2(globset.Globset):
