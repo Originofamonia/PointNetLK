@@ -1,7 +1,7 @@
 """ datasets """
 import os
 
-import numpy
+import numpy as np
 import torch
 import pandas as pd
 import torch.utils.data
@@ -52,7 +52,16 @@ class Atrial(Dataset):
         study_id = self.study_ids[idx]
         path = f'{self.dataset_path}/Cleaned_PatientData/{study_id}/{study_id}_eam_data.csv'
         df = pd.read_csv(path)
-        print(df)
+        points = np.float32(df[['x_norm', 'y_norm', 'z_norm']].values)
+        if self.transform:
+            points = self.transform(points)
+
+        unipolar = df['unipolar'].values
+        bipolar = df['unipolar'].values
+
+        af_type = self.af_labels[idx]
+        re_af_type = self.re_af_labels[idx]
+        return points, unipolar, bipolar, af_type, re_af_type
 
     def __len__(self):
         return len(self.study_ids)
@@ -128,7 +137,7 @@ class CADset4tracking_fixed_perturbation(torch.utils.data.Dataset):
                  template_modifier=None,
                  fmt_trans=False):
         self.dataset = dataset
-        self.perturbation = numpy.array(perturbation)  # twist (len(dataset), 6)
+        self.perturbation = np.array(perturbation)  # twist (len(dataset), 6)
         self.source_modifier = source_modifier
         self.template_modifier = template_modifier
         self.fmt_trans = fmt_trans  # twist or (rotation and translation)
@@ -159,7 +168,7 @@ class CADset4tracking_fixed_perturbation(torch.utils.data.Dataset):
 
     def __getitem__(self, index):
         twist = torch.from_numpy(
-            numpy.array(self.perturbation[index])).contiguous().view(1, 6)
+            np.array(self.perturbation[index])).contiguous().view(1, 6)
         pm, _ = self.dataset[index]
         x = twist.to(pm)
         if self.source_modifier is not None:
