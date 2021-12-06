@@ -40,13 +40,13 @@ class Atrial(Dataset):
         filtered_df = labels_df[labels_df['Study number'].isin(self.dirs)]
         self.template_id = 0  # select 0 as the template
         if is_train:
-            self.study_ids = filtered_df['Study number'].values[1:5]
-            self.af_labels = filtered_df['AF type'].values[1:5]
-            self.re_af_labels = filtered_df['1Y re AF'].values[1:5]
+            self.study_ids = filtered_df['Study number'].values[0:4]
+            self.af_labels = filtered_df['AF type'].values[0:4]
+            self.re_af_labels = filtered_df['1Y re AF'].values[0:4]
         else:
-            self.study_ids = filtered_df['Study number'].values[5:]
-            self.af_labels = filtered_df['AF type'].values[5:]
-            self.re_af_labels = filtered_df['1Y re AF'].values[5:]
+            self.study_ids = filtered_df['Study number'].values[4:]
+            self.af_labels = filtered_df['AF type'].values[4:]
+            self.re_af_labels = filtered_df['1Y re AF'].values[4:]
 
     def __getitem__(self, idx):
         study_id = self.study_ids[idx]
