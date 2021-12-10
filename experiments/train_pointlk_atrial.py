@@ -28,7 +28,7 @@ def options(argv=None):
 
     # required.
     parser.add_argument('-o', '--outfile', type=str,
-                        default='/home/qiyuan/2021fall/PointNetLK/outputs/atrial.pt',
+                        default='/home/qiyuan/2021fall/PointNetLK/outputs/atrial',
                         help='output filename (prefix)')  # the result: ${BASENAME}_model_best.pth
     parser.add_argument('-i', '--dataset_path', type=str,
                         default='/home/qiyuan/2021fall/PointNetLK/6363-Project',
@@ -101,10 +101,10 @@ def main(args):
 
     # training
     act = Action(args)
-    run(args, trainset, testset, act)
+    train(args, trainset, testset, act)
 
 
-def run(args, trainset, testset, action):
+def train(args, trainset, testset, action):
     if not torch.cuda.is_available():
         args.device = 'cpu'
     args.device = torch.device(args.device)
@@ -158,22 +158,23 @@ def run(args, trainset, testset, action):
 
         LOGGER.info('epoch, %04d, %f, %f, %f, %f', epoch + 1, running_loss,
                     val_loss, running_info, val_info)
-        snap = {'epoch': epoch + 1,
-                'model': model.state_dict(),
-                'min_loss': min_loss,
-                'optimizer': optimizer.state_dict(), }
-        if is_best:
-            save_checkpoint(snap, args.outfile, 'snap_best')
-            save_checkpoint(model.state_dict(), args.outfile, 'model_best')
 
-        save_checkpoint(snap, args.outfile, 'snap_last')
-        save_checkpoint(model.state_dict(), args.outfile, 'model_last')
+        if is_best:
+            # snap = {'epoch': epoch + 1,
+            #         'model': model.state_dict(),
+            #         'min_loss': min_loss,
+            #         'optimizer': optimizer.state_dict(), }
+            # save_checkpoint(snap, args.outfile, 'snap_best')
+            save_checkpoint(model.state_dict(), args.outfile, 'best')
+
+        # save_checkpoint(snap, args.outfile, 'snap_last')
+        # save_checkpoint(model.state_dict(), args.outfile, 'model_last')
 
     LOGGER.debug('train, end')
 
 
 def save_checkpoint(state, filename, suffix):
-    torch.save(state, '{}_{}.pth'.format(filename, suffix))
+    torch.save(state, f'{filename}_{suffix}.pt')
 
 
 class Action:
@@ -271,8 +272,8 @@ class Action:
                                             self.p1_zero_mean)
         # r = model(p0, p1, self.max_iter)
         est_g = model.g  # [b, 4, 4]
-        if epoch == args.epochs - 1:
-            self.plot_pointcloud(est_g[0], p0[0], p1[0])
+        # if epoch == args.epochs - 1:
+        #     self.plot_pointcloud(est_g[0], p0[0], p1[0])
 
         loss_g = ptlk.pointlk.PointLK.comp(est_g, igt)
 
@@ -306,7 +307,7 @@ class Action:
 
         ax.scatter(p1[:, 0], p1[:, 1], p1[:, 2], c='b')
         ax.scatter(p0_rotated[:, 0], p0_rotated[:, 1], p0_rotated[:, 2], c='r')
-        plt.savefig('pt.jpg')
+        plt.savefig(f'pt.jpg')
 
 
 class ShapeNet2_transform_coordinate:
