@@ -140,7 +140,7 @@ def train(args, trainset, testset, action):
     for epoch in range(args.start_epoch, args.epochs):
         # scheduler.step()
 
-        running_loss, running_info = action.train_1(args, model, trainloader,
+        running_loss, running_info = action.train_1(model, trainloader,
                                                     optimizer)
         # val_loss, val_info = action.eval_1(model, testloader)
 
