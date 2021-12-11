@@ -338,6 +338,7 @@ class Action:
                                                 self.p1_zero_mean)
 
             est_g = model.g
+            print(est_g)
 
         LOGGER.debug('eval, end')
 
