@@ -37,16 +37,16 @@ class Atrial(Dataset):
         self.training = training
         self.all_examples, self.dirs = self.get_all_examples(dataset_path)
         labels_df = pd.read_csv(f'{dataset_path}/label.csv')
-        filtered_df = labels_df[labels_df['Study number'].isin(self.dirs)]  # total 8 samples
+        self.filtered_df = labels_df[labels_df['Study number'].isin(self.dirs)]  # total 8 samples
         self.template_id = 0  # select 0 as the template for inference
         if training:
-            self.study_ids = filtered_df['Study number'].values[1:5]
-            self.af_labels = filtered_df['AF type'].values[1:5]
-            self.re_af_labels = filtered_df['1Y re AF'].values[1:5]
+            self.study_ids = self.filtered_df['Study number'].values[1:5]
+            self.af_labels = self.filtered_df['AF type'].values[1:5]
+            self.re_af_labels = self.filtered_df['1Y re AF'].values[1:5]
         else:
-            self.study_ids = filtered_df['Study number'].values[1:]
-            self.af_labels = filtered_df['AF type'].values[1:]
-            self.re_af_labels = filtered_df['1Y re AF'].values[1:]
+            self.study_ids = self.filtered_df['Study number'].values[1:]
+            self.af_labels = self.filtered_df['AF type'].values[1:]
+            self.re_af_labels = self.filtered_df['1Y re AF'].values[1:]
 
     def __getitem__(self, idx):
         study_id = self.study_ids[idx]
@@ -61,6 +61,20 @@ class Atrial(Dataset):
 
         af_type = torch.from_numpy(np.asarray(self.af_labels[idx]))
         re_af_type = torch.from_numpy(np.asarray(self.re_af_labels[idx]))
+        return points, unipolar, bipolar, af_type, re_af_type
+
+    def get_template(self):
+        study_id = self.filtered_df['Study number'].values[0]
+        path = f'{self.dataset_path}/Cleaned_PatientData/{study_id}/{study_id}_eam_data.csv'
+        df = pd.read_csv(path)
+        points = torch.from_numpy(
+            np.float32(df[['x_norm', 'y_norm', 'z_norm']].values))
+
+        unipolar = torch.from_numpy(df['unipolar'].values)
+        bipolar = torch.from_numpy(df['unipolar'].values)
+
+        af_type = torch.from_numpy(np.asarray(self.filtered_df['AF type'].values[0]))
+        re_af_type = torch.from_numpy(np.asarray(self.filtered_df['1Y re AF'].values[0]))
         return points, unipolar, bipolar, af_type, re_af_type
 
     def __len__(self):
@@ -102,7 +116,7 @@ class AtrialTransform(Dataset):
         if self.training:
             return p0, p1, igt, unipolar, bipolar, af_type, re_af_type
         else:
-            template_all = self.dataset[0]
+            template_all = self.dataset.get_template()
             return (p0, unipolar, bipolar, af_type, re_af_type), template_all  # p0 is source in inference
 
 
