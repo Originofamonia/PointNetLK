@@ -103,7 +103,7 @@ class AtrialTransform(Dataset):
             return p0, p1, igt, unipolar, bipolar, af_type, re_af_type
         else:
             template_all = self.dataset[0]
-            return p0, unipolar, bipolar, af_type, re_af_type, template_all  # p0 is source in inference
+            return (p0, unipolar, bipolar, af_type, re_af_type), template_all  # p0 is source in inference
 
 
 class ShapeNet2(globset.Globset):

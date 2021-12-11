@@ -325,11 +325,16 @@ class Action:
         gloss = 0.0
         count = 0
         for i, data in enumerate(testloader):
-            p0, unipolar, bipolar, af_type, re_af_type, template_all = data
-            p0 = p0.to(self.args.device)  # template
+            source_all, template_all = data
+            # p1, unipolar1, bipolar1, af_type1, re_af_type1 = template_all
+            source_all = tuple(t.to(self.args.device) for t in source_all)
+            template_all = tuple(t.to(self.args.device) for t in template_all)
+            p0, unipolar0, bipolar0, af_type0, re_af_type0 = source_all
+            p1, unipolar1, bipolar1, af_type1, re_af_type1 = template_all
+            # p0 = p0.to(self.args.device)  # template
             # p1 = p1.to(self.args.device)  # source
             # igt = igt.to(self.args.device)  # igt: p0 -> p1
-            r = ptlk.pointlk.PointLK.do_forward(model, p0, p1,
+            r = ptlk.pointlk.PointLK.do_forward(model, p1, p0,
                                                 self.args.max_iter,
                                                 self.xtol,
                                                 self.p0_zero_mean,
