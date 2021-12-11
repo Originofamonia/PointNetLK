@@ -338,23 +338,31 @@ class Action:
                                                 self.p1_zero_mean)
 
             est_g = model.g
-            print(est_g)
+            desc = f'before_{i}'
+            self.plot_pointcloud(p0[0], p1[0], desc=desc)  # plot before transform
+            p0_4 = torch.cat((p0[0], unipolar0[0].unsqueeze(dim=-1)), dim=0)
+            p1_4 = torch.cat((p1[0], unipolar1[0].unsqueeze(dim=-1)), dim=0)
+            rotated_p1_4 = torch.matmul(p1_4, torch.inverse(est_g[0]))
+            desc = f'after_{i}'
+            self.plot_pointcloud(p0[0], rotated_p1_4, desc=desc)
+
 
         LOGGER.debug('eval, end')
 
-    def plot_pointcloud(self, est_g, p0, p1):
-        p0_4 = torch.zeros(len(p0)).unsqueeze(1).to(p1)
-        p0_cat = torch.cat((p0, p0_4), dim=-1)
+    def plot_pointcloud(self, p0, p1, desc):
+
+        # p0_4 = torch.zeros(len(p0)).unsqueeze(1).to(p1)
+        # p0_cat = torch.cat((p0, p0_4), dim=-1)
         p1 = p1.detach().cpu().numpy()
-        p0_rotated = torch.matmul(p0_cat, est_g)
-        p0_rotated = p0_rotated.detach().cpu().numpy()
+        # p0_rotated = torch.matmul(p0_cat, est_g)
+        p0 = p0.detach().cpu().numpy()
 
         fig = plt.figure(figsize=(8, 8))
         ax = fig.add_subplot(111, projection='3d')
 
         ax.scatter(p1[:, 0], p1[:, 1], p1[:, 2], c='b')
-        ax.scatter(p0_rotated[:, 0], p0_rotated[:, 1], p0_rotated[:, 2], c='r')
-        plt.savefig(f'pt.jpg')
+        ax.scatter(p0[:, 0], p0[:, 1], p0[:, 2], c='r')
+        plt.savefig(f'{desc}.jpg')
 
 
 def get_datasets(args):
