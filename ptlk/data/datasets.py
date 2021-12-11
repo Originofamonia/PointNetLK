@@ -44,9 +44,9 @@ class Atrial(Dataset):
             self.af_labels = filtered_df['AF type'].values[1:5]
             self.re_af_labels = filtered_df['1Y re AF'].values[1:5]
         else:
-            self.study_ids = filtered_df['Study number'].values[5:]
-            self.af_labels = filtered_df['AF type'].values[5:]
-            self.re_af_labels = filtered_df['1Y re AF'].values[5:]
+            self.study_ids = filtered_df['Study number'].values[1:]
+            self.af_labels = filtered_df['AF type'].values[1:]
+            self.re_af_labels = filtered_df['1Y re AF'].values[1:]
 
     def __getitem__(self, idx):
         study_id = self.study_ids[idx]
@@ -100,10 +100,10 @@ class AtrialTransform(Dataset):
 
         # p0: template, p1: source, igt: transform matrix from p0 to p1
         if self.training:
-            return p0, p1, igt
+            return p0, p1, igt, unipolar, bipolar, af_type, re_af_type
         else:
             template_all = self.dataset[0]
-            return p0, p1, igt, template_all  # p0 is source in inference
+            return p0, unipolar, bipolar, af_type, re_af_type, template_all  # p0 is source in inference
 
 
 class ShapeNet2(globset.Globset):

@@ -141,66 +141,29 @@ def train(args, trainset, testset, action):
         # scheduler.step()
 
         running_loss, running_info = action.train_1(args, model, trainloader,
-                                                    optimizer, epoch)
-        val_loss, val_info = action.eval_1(model, testloader, args.device)
+                                                    optimizer)
+        # val_loss, val_info = action.eval_1(model, testloader)
 
-        is_best = val_loss < min_loss
-        min_loss = min(val_loss, min_loss)
+        # is_best = val_loss < min_loss
+        # min_loss = min(val_loss, min_loss)
+        #
+        # LOGGER.info('epoch, %04d, %f, %f, %f, %f', epoch + 1, running_loss,
+        #             val_loss, running_info, val_info)
 
-        LOGGER.info('epoch, %04d, %f, %f, %f, %f', epoch + 1, running_loss,
-                    val_loss, running_info, val_info)
-
-        if is_best:
+        # if is_best:
             # snap = {'epoch': epoch + 1,
             #         'model': model.state_dict(),
             #         'min_loss': min_loss,
             #         'optimizer': optimizer.state_dict(), }
             # save_checkpoint(snap, args.outfile, 'snap_best')
-            save_checkpoint(model.state_dict(), args.outfile, 'best')
+        save_checkpoint(model.state_dict(), args.outfile, 'best')
 
         # save_checkpoint(snap, args.outfile, 'snap_last')
         # save_checkpoint(model.state_dict(), args.outfile, 'model_last')
 
     LOGGER.debug('train, end')
 
-
-def evaluate_plot(args, trainset, testset, action):
-    """
-    infer on training & test sets to plot point cloud
-    """
-    if not torch.cuda.is_available():
-        args.device = 'cpu'
-    args.device = torch.device(args.device)
-
-    LOGGER.debug('Trainer (PID=%d), %s', os.getpid(), args)
-
-    model = action.create_model()
-    if args.pretrained:
-        assert os.path.isfile(args.pretrained)
-        model.load_state_dict(torch.load(args.pretrained, map_location='cpu'))
-    model.to(args.device)
-
-    checkpoint = None
-    if args.resume:
-        assert os.path.isfile(args.resume)
-        checkpoint = torch.load(args.resume)
-        args.start_epoch = checkpoint['epoch']
-        model.load_state_dict(checkpoint['model'])
-
-    # dataloader
-    testloader = torch.utils.data.DataLoader(
-        testset,
-        batch_size=args.batch_size, shuffle=False, num_workers=args.workers)
-    trainloader = torch.utils.data.DataLoader(
-        trainset,
-        batch_size=args.batch_size, shuffle=False, num_workers=args.workers)
-
-    # training
-    LOGGER.debug('eval, begin')
-    # TODO: change below
-
-
-    LOGGER.debug('eval, end')
+    action.evaluate_plot(model, trainset, testset)
 
 
 def save_checkpoint(state, filename, suffix):
@@ -250,13 +213,13 @@ class Action:
     def create_from_pointnet_features(self, ptnet):
         return ptlk.pointlk.PointLK(ptnet, self.args.delta, self.args.learn_delta)
 
-    def train_1(self, model, trainloader, optimizer, epoch):
+    def train_1(self, model, trainloader, optimizer):
         model.train()
         vloss = 0.0
         gloss = 0.0
         count = 0
         for i, data in enumerate(trainloader):
-            loss, loss_g = self.compute_loss(model, data, epoch)
+            loss, loss_g = self.compute_loss(model, data)
 
             # forward + backward + optimize
             optimizer.zero_grad()
@@ -273,14 +236,14 @@ class Action:
         ave_gloss = float(gloss) / count
         return ave_vloss, ave_gloss
 
-    def eval_1(self, model, testloader, device):
+    def eval_1(self, model, testloader):
         model.eval()
         vloss = 0.0
         gloss = 0.0
         count = 0
         with torch.no_grad():
             for i, data in enumerate(testloader):
-                loss, loss_g = self.compute_loss(model, data, device)
+                loss, loss_g = self.compute_loss(model, data)
 
                 vloss1 = loss.item()
                 vloss += vloss1
@@ -292,8 +255,8 @@ class Action:
         ave_gloss = float(gloss) / count
         return ave_vloss, ave_gloss
 
-    def compute_loss(self, model, data, epoch):
-        p0, p1, igt = data
+    def compute_loss(self, model, data):
+        p0, p1, igt, _,  _, _, _ = data
         p0 = p0.to(self.args.device)  # template
         p1 = p1.to(self.args.device)  # source
         igt = igt.to(self.args.device)  # igt: p0 -> p1
@@ -325,6 +288,56 @@ class Action:
             loss = loss_g
 
         return loss, loss_g
+
+    def evaluate_plot(self, model, trainset, testset):
+        """
+        infer on training & test sets to plot point cloud
+        """
+        if not torch.cuda.is_available():
+            self.args.device = 'cpu'
+        self.args.device = torch.device(self.args.device)
+
+        LOGGER.debug('Trainer (PID=%d), %s', os.getpid(),)
+
+        # model = action.create_model()
+        # if self.args.pretrained:
+        #     assert os.path.isfile(self.args.pretrained)
+        #     model.load_state_dict(
+        #         torch.load(self.args.pretrained, map_location='cpu'))
+        # model.to(self.args.device)
+
+        checkpoint = None
+        if self.args.resume:
+            assert os.path.isfile(self.args.resume)
+            checkpoint = torch.load(self.args.resume)
+            self.args.start_epoch = checkpoint['epoch']
+            model.load_state_dict(checkpoint['model'])
+
+        # dataloader
+        testloader = torch.utils.data.DataLoader(
+            testset,
+            batch_size=1, shuffle=False, num_workers=self.args.workers)
+
+        # training
+        LOGGER.debug('eval, begin')
+        model.eval()
+        vloss = 0.0
+        gloss = 0.0
+        count = 0
+        for i, data in enumerate(testloader):
+            p0, unipolar, bipolar, af_type, re_af_type, template_all = data
+            p0 = p0.to(self.args.device)  # template
+            # p1 = p1.to(self.args.device)  # source
+            # igt = igt.to(self.args.device)  # igt: p0 -> p1
+            r = ptlk.pointlk.PointLK.do_forward(model, p0, p1,
+                                                self.args.max_iter,
+                                                self.xtol,
+                                                self.p0_zero_mean,
+                                                self.p1_zero_mean)
+
+            est_g = model.g
+
+        LOGGER.debug('eval, end')
 
     def plot_pointcloud(self, est_g, p0, p1):
         p0_4 = torch.zeros(len(p0)).unsqueeze(1).to(p1)
@@ -383,7 +396,6 @@ def main():
     act = Action(args)
     train(args, trainset, testset, act)
     args.resume = True
-    evaluate_plot(args, trainset, testset, act)
     LOGGER.debug('done (PID=%d)', os.getpid())
 
 
