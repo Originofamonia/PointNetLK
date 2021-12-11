@@ -163,7 +163,7 @@ def train(args, trainset, testset, action):
 
     LOGGER.debug('train, end')
 
-    action.evaluate_plot(model, trainset, testset)
+    action.infer_plot(model, testset)
 
 
 def save_checkpoint(state, filename, suffix):
@@ -289,7 +289,7 @@ class Action:
 
         return loss, loss_g
 
-    def evaluate_plot(self, model, trainset, testset):
+    def infer_plot(self, model, testset):
         """
         infer on training & test sets to plot point cloud
         """

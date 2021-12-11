@@ -38,6 +38,7 @@ class Atrial(Dataset):
         self.all_examples, self.dirs = self.get_all_examples(dataset_path)
         labels_df = pd.read_csv(f'{dataset_path}/label.csv')
         self.filtered_df = labels_df[labels_df['Study number'].isin(self.dirs)]  # total 8 samples
+        self.get_n_points()
         self.template_id = 0  # select 0 as the template for inference
         if training:
             self.study_ids = self.filtered_df['Study number'].values[1:5]
@@ -62,6 +63,14 @@ class Atrial(Dataset):
         af_type = torch.from_numpy(np.asarray(self.af_labels[idx]))
         re_af_type = torch.from_numpy(np.asarray(self.re_af_labels[idx]))
         return points, unipolar, bipolar, af_type, re_af_type
+
+    def get_n_points(self):
+        n_points = []
+        for study_id in self.filtered_df['Study number'].values:
+            path = f'{self.dataset_path}/Cleaned_PatientData/{study_id}/{study_id}_eam_data.csv'
+            df = pd.read_csv(path)
+            n_points.append(len(df) - 1)
+        print(n_points)
 
     def get_template(self):
         study_id = self.filtered_df['Study number'].values[0]
