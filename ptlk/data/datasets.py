@@ -38,7 +38,7 @@ class Atrial(Dataset):
         self.all_examples, self.dirs = self.get_all_examples(dataset_path)
         labels_df = pd.read_csv(f'{dataset_path}/label.csv')
         self.filtered_df = labels_df[labels_df['Study number'].isin(self.dirs)]  # total 8 samples
-        self.get_n_points()
+        # self.get_n_points()  # only need once
         self.template_id = 0  # select 0 as the template for inference
         if training:
             self.study_ids = self.filtered_df['Study number'].values[1:5]
@@ -53,6 +53,7 @@ class Atrial(Dataset):
         study_id = self.study_ids[idx]
         path = f'{self.dataset_path}/Cleaned_PatientData/{study_id}/{study_id}_eam_data.csv'
         df = pd.read_csv(path)
+        df = df.sample(n=405)
         points = torch.from_numpy(np.float32(df[['x_norm', 'y_norm', 'z_norm']].values))
         # if self.transform:
         #     points = self.transform(points)
@@ -69,8 +70,8 @@ class Atrial(Dataset):
         for study_id in self.filtered_df['Study number'].values:
             path = f'{self.dataset_path}/Cleaned_PatientData/{study_id}/{study_id}_eam_data.csv'
             df = pd.read_csv(path)
-            n_points.append(len(df) - 1)
-        print(n_points)
+            n_points.append(len(df))
+        print(n_points)  # [764, 405, 1373, 593, 4470, 2682, 1592, 2493]
 
     def get_template(self):
         study_id = self.filtered_df['Study number'].values[0]
