@@ -102,6 +102,8 @@ def main(args):
     # training
     act = Action(args)
     train(args, trainset, testset, act)
+    args.resume = True
+    evaluate_plot(args, trainset, testset, act)
 
 
 def train(args, trainset, testset, action):
@@ -171,6 +173,45 @@ def train(args, trainset, testset, action):
         # save_checkpoint(model.state_dict(), args.outfile, 'model_last')
 
     LOGGER.debug('train, end')
+
+
+def evaluate_plot(args, trainset, testset, action):
+    """
+    infer on training & test sets to plot point cloud
+    """
+    if not torch.cuda.is_available():
+        args.device = 'cpu'
+    args.device = torch.device(args.device)
+
+    LOGGER.debug('Trainer (PID=%d), %s', os.getpid(), args)
+
+    model = action.create_model()
+    if args.pretrained:
+        assert os.path.isfile(args.pretrained)
+        model.load_state_dict(torch.load(args.pretrained, map_location='cpu'))
+    model.to(args.device)
+
+    checkpoint = None
+    if args.resume:
+        assert os.path.isfile(args.resume)
+        checkpoint = torch.load(args.resume)
+        args.start_epoch = checkpoint['epoch']
+        model.load_state_dict(checkpoint['model'])
+
+    # dataloader
+    testloader = torch.utils.data.DataLoader(
+        testset,
+        batch_size=args.batch_size, shuffle=False, num_workers=args.workers)
+    trainloader = torch.utils.data.DataLoader(
+        trainset,
+        batch_size=args.batch_size, shuffle=False, num_workers=args.workers)
+
+    # training
+    LOGGER.debug('eval, begin')
+    # TODO: change below
+    val_loss, val_info = action.eval_1(model, testloader, args.device)
+
+    LOGGER.debug('eval, end')
 
 
 def save_checkpoint(state, filename, suffix):
@@ -335,11 +376,11 @@ def get_datasets(args):
     trainset = ptlk.data.datasets.AtrialTransform(traindata,
                                                   ptlk.data.transforms.RandomTransformSE3(
                                                       args.mag,
-                                                      mag_randomly))
+                                                      mag_randomly), training=True)
     testset = ptlk.data.datasets.AtrialTransform(testdata,
                                                  ptlk.data.transforms.RandomTransformSE3(
                                                      args.mag,
-                                                     mag_randomly))
+                                                     mag_randomly), training=False)
 
     return trainset, testset
 

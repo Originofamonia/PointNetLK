@@ -38,15 +38,15 @@ class Atrial(Dataset):
         self.all_examples, self.dirs = self.get_all_examples(dataset_path)
         labels_df = pd.read_csv(f'{dataset_path}/label.csv')
         filtered_df = labels_df[labels_df['Study number'].isin(self.dirs)]
-        self.template_id = 0  # select 0 as the template
+        self.template_id = 0  # select 0 as the template for inference
         if is_train:
-            self.study_ids = filtered_df['Study number'].values[0:4]
-            self.af_labels = filtered_df['AF type'].values[0:4]
-            self.re_af_labels = filtered_df['1Y re AF'].values[0:4]
+            self.study_ids = filtered_df['Study number'].values[1:5]
+            self.af_labels = filtered_df['AF type'].values[1:5]
+            self.re_af_labels = filtered_df['1Y re AF'].values[1:5]
         else:
-            self.study_ids = filtered_df['Study number'].values[4:]
-            self.af_labels = filtered_df['AF type'].values[4:]
-            self.re_af_labels = filtered_df['1Y re AF'].values[4:]
+            self.study_ids = filtered_df['Study number'].values[5:]
+            self.af_labels = filtered_df['AF type'].values[5:]
+            self.re_af_labels = filtered_df['1Y re AF'].values[5:]
 
     def __getitem__(self, idx):
         study_id = self.study_ids[idx]
@@ -74,7 +74,8 @@ class Atrial(Dataset):
 
 class AtrialTransform(Dataset):
     def __init__(self, dataset, rigid_transform, source_modifier=None,
-                 template_modifier=None):
+                 template_modifier=None, training=True):
+        self.training = training
         self.dataset = dataset
         self.rigid_transform = rigid_transform
         self.source_modifier = source_modifier
@@ -84,21 +85,38 @@ class AtrialTransform(Dataset):
         return len(self.dataset)
 
     def __getitem__(self, index):
-        pm, _, _, _, _ = self.dataset[index]
-        if self.source_modifier is not None:
-            p_ = self.source_modifier(pm)
-            p1 = self.rigid_transform(p_)
-        else:
-            p1 = self.rigid_transform(pm)
-        igt = self.rigid_transform.igt
+        if self.training:
+            pm, _, _, _, _ = self.dataset[index]
+            if self.source_modifier is not None:
+                p_ = self.source_modifier(pm)
+                p1 = self.rigid_transform(p_)
+            else:
+                p1 = self.rigid_transform(pm)
+            igt = self.rigid_transform.igt
 
-        if self.template_modifier is not None:
-            p0 = self.template_modifier(pm)
-        else:
-            p0 = pm
+            if self.template_modifier is not None:
+                p0 = self.template_modifier(pm)
+            else:
+                p0 = pm
 
-        # p0: template, p1: source, igt: transform matrix from p0 to p1
-        return p0, p1, igt
+            # p0: template, p1: source, igt: transform matrix from p0 to p1
+            return p0, p1, igt
+        else:
+            pm, _, _, _, _ = self.dataset[index]
+            if self.source_modifier is not None:
+                p_ = self.source_modifier(pm)
+                p1 = self.rigid_transform(p_)
+            else:
+                p1 = self.rigid_transform(pm)
+            igt = self.rigid_transform.igt
+
+            if self.template_modifier is not None:
+                p0 = self.template_modifier(pm)
+            else:
+                p0 = pm
+
+            # p0: template, p1: source, igt: transform matrix from p0 to p1
+            return p0, p1, igt
 
 
 class ShapeNet2(globset.Globset):
