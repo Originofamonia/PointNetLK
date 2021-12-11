@@ -321,12 +321,9 @@ class Action:
         # training
         LOGGER.debug('eval, begin')
         model.eval()
-        vloss = 0.0
-        gloss = 0.0
-        count = 0
+
         for i, data in enumerate(testloader):
             source_all, template_all = data
-            # p1, unipolar1, bipolar1, af_type1, re_af_type1 = template_all
             source_all = tuple(t.to(self.args.device) for t in source_all)
             template_all = tuple(t.to(self.args.device) for t in template_all)
             p0, unipolar0, bipolar0, af_type0, re_af_type0 = source_all
