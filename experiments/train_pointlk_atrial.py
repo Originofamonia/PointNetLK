@@ -95,17 +95,6 @@ def options(argv=None):
     return args
 
 
-def main(args):
-    # dataset
-    trainset, testset = get_datasets(args)
-
-    # training
-    act = Action(args)
-    train(args, trainset, testset, act)
-    args.resume = True
-    evaluate_plot(args, trainset, testset, act)
-
-
 def train(args, trainset, testset, action):
     if not torch.cuda.is_available():
         args.device = 'cpu'
@@ -209,7 +198,7 @@ def evaluate_plot(args, trainset, testset, action):
     # training
     LOGGER.debug('eval, begin')
     # TODO: change below
-    val_loss, val_info = action.eval_1(model, testloader, args.device)
+
 
     LOGGER.debug('eval, end')
 
@@ -221,18 +210,19 @@ def save_checkpoint(state, filename, suffix):
 class Action:
     def __init__(self, args):
         # PointNet
-        self.pointnet = args.pointnet  # tune or fixed
-        self.transfer_from = args.transfer_from
-        self.dim_k = args.dim_k
+        self.args = args
+        # self.pointnet = args.pointnet  # tune or fixed
+        # self.transfer_from = args.transfer_from
+        # self.dim_k = args.dim_k
         self.sym_fn = None
         if args.symfn == 'max':
             self.sym_fn = ptlk.pointnet.symfn_max
         elif args.symfn == 'avg':
             self.sym_fn = ptlk.pointnet.symfn_avg
         # LK
-        self.delta = args.delta
-        self.learn_delta = args.learn_delta
-        self.max_iter = args.max_iter
+        # self.delta = args.delta
+        # self.learn_delta = args.learn_delta
+        # self.max_iter = args.max_iter
         self.xtol = 1.0e-7
         self.p0_zero_mean = True
         self.p1_zero_mean = True
@@ -244,29 +234,29 @@ class Action:
         return self.create_from_pointnet_features(ptnet)
 
     def create_pointnet_features(self):
-        ptnet = ptlk.pointnet.PointNet_features(self.dim_k, use_tnet=False,
+        ptnet = ptlk.pointnet.PointNet_features(self.args.dim_k, use_tnet=False,
                                                 sym_fn=self.sym_fn)
-        if self.transfer_from and os.path.isfile(self.transfer_from):
+        if self.args.transfer_from and os.path.isfile(self.args.transfer_from):
             ptnet.load_state_dict(
-                torch.load(self.transfer_from, map_location='cpu'))
+                torch.load(self.args.transfer_from, map_location='cpu'))
         # if self.pointnet == 'tune':
         #     pass
         # el
-        if self.pointnet == 'fixed':
+        if self.args.pointnet == 'fixed':
             for param in ptnet.parameters():
                 param.requires_grad_(False)
         return ptnet
 
     def create_from_pointnet_features(self, ptnet):
-        return ptlk.pointlk.PointLK(ptnet, self.delta, self.learn_delta)
+        return ptlk.pointlk.PointLK(ptnet, self.args.delta, self.args.learn_delta)
 
-    def train_1(self, args, model, trainloader, optimizer, epoch):
+    def train_1(self, model, trainloader, optimizer, epoch):
         model.train()
         vloss = 0.0
         gloss = 0.0
         count = 0
         for i, data in enumerate(trainloader):
-            loss, loss_g = self.compute_loss(args, model, data, epoch)
+            loss, loss_g = self.compute_loss(model, data, epoch)
 
             # forward + backward + optimize
             optimizer.zero_grad()
@@ -290,7 +280,7 @@ class Action:
         count = 0
         with torch.no_grad():
             for i, data in enumerate(testloader):
-                loss, loss_g = self.compute_loss(args, model, data, device)
+                loss, loss_g = self.compute_loss(model, data, device)
 
                 vloss1 = loss.item()
                 vloss += vloss1
@@ -302,12 +292,12 @@ class Action:
         ave_gloss = float(gloss) / count
         return ave_vloss, ave_gloss
 
-    def compute_loss(self, args, model, data, epoch):
+    def compute_loss(self, model, data, epoch):
         p0, p1, igt = data
-        p0 = p0.to(args.device)  # template
-        p1 = p1.to(args.device)  # source
-        igt = igt.to(args.device)  # igt: p0 -> p1
-        r = ptlk.pointlk.PointLK.do_forward(model, p0, p1, self.max_iter,
+        p0 = p0.to(self.args.device)  # template
+        p1 = p1.to(self.args.device)  # source
+        igt = igt.to(self.args.device)  # igt: p0 -> p1
+        r = ptlk.pointlk.PointLK.do_forward(model, p0, p1, self.args.max_iter,
                                             self.xtol,
                                             self.p0_zero_mean,
                                             self.p1_zero_mean)
@@ -351,14 +341,6 @@ class Action:
         plt.savefig(f'pt.jpg')
 
 
-class ShapeNet2_transform_coordinate:
-    def __init__(self):
-        pass
-
-    def __call__(self, mesh):
-        return mesh.clone().rot_x()
-
-
 def get_datasets(args):
     cinfo = None
     transform = torchvision.transforms.Compose([
@@ -367,9 +349,9 @@ def get_datasets(args):
         ptlk.data.transforms.Resampler(args.num_points),
     ])
 
-    traindata = ptlk.data.datasets.Atrial(args.dataset_path, is_train=True,
+    traindata = ptlk.data.datasets.Atrial(args.dataset_path, training=True,
                                           transform=transform)
-    testdata = ptlk.data.datasets.Atrial(args.dataset_path, is_train=False,
+    testdata = ptlk.data.datasets.Atrial(args.dataset_path, training=False,
                                          transform=transform)
 
     mag_randomly = True
@@ -385,7 +367,7 @@ def get_datasets(args):
     return trainset, testset
 
 
-if __name__ == '__main__':
+def main():
     args = options()
 
     logging.basicConfig(
@@ -394,5 +376,16 @@ if __name__ == '__main__':
         filename=args.logfile)
     LOGGER.debug('Training (PID=%d), %s', os.getpid(), args)
 
-    main(args)
+    # dataset
+    trainset, testset = get_datasets(args)
+
+    # training
+    act = Action(args)
+    train(args, trainset, testset, act)
+    args.resume = True
+    evaluate_plot(args, trainset, testset, act)
     LOGGER.debug('done (PID=%d)', os.getpid())
+
+
+if __name__ == '__main__':
+    main()

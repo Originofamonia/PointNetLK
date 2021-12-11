@@ -30,16 +30,16 @@ class ModelNet(globset.Globset):
 class Atrial(Dataset):
     """ atrial dataset """
 
-    def __init__(self, dataset_path, is_train=True, transform=None):
+    def __init__(self, dataset_path, training=True, transform=None):
         loader = mesh.offread
         self.dataset_path = dataset_path
         self.transform = transform
-        self.is_train = is_train
+        self.training = training
         self.all_examples, self.dirs = self.get_all_examples(dataset_path)
         labels_df = pd.read_csv(f'{dataset_path}/label.csv')
-        filtered_df = labels_df[labels_df['Study number'].isin(self.dirs)]
+        filtered_df = labels_df[labels_df['Study number'].isin(self.dirs)]  # total 8 samples
         self.template_id = 0  # select 0 as the template for inference
-        if is_train:
+        if training:
             self.study_ids = filtered_df['Study number'].values[1:5]
             self.af_labels = filtered_df['AF type'].values[1:5]
             self.re_af_labels = filtered_df['1Y re AF'].values[1:5]
@@ -85,38 +85,25 @@ class AtrialTransform(Dataset):
         return len(self.dataset)
 
     def __getitem__(self, index):
+        pm, unipolar, bipolar, af_type, re_af_type = self.dataset[index]
+        if self.source_modifier is not None:
+            p_ = self.source_modifier(pm)
+            p1 = self.rigid_transform(p_)
+        else:
+            p1 = self.rigid_transform(pm)
+        igt = self.rigid_transform.igt
+
+        if self.template_modifier is not None:
+            p0 = self.template_modifier(pm)
+        else:
+            p0 = pm
+
+        # p0: template, p1: source, igt: transform matrix from p0 to p1
         if self.training:
-            pm, _, _, _, _ = self.dataset[index]
-            if self.source_modifier is not None:
-                p_ = self.source_modifier(pm)
-                p1 = self.rigid_transform(p_)
-            else:
-                p1 = self.rigid_transform(pm)
-            igt = self.rigid_transform.igt
-
-            if self.template_modifier is not None:
-                p0 = self.template_modifier(pm)
-            else:
-                p0 = pm
-
-            # p0: template, p1: source, igt: transform matrix from p0 to p1
             return p0, p1, igt
         else:
-            pm, _, _, _, _ = self.dataset[index]
-            if self.source_modifier is not None:
-                p_ = self.source_modifier(pm)
-                p1 = self.rigid_transform(p_)
-            else:
-                p1 = self.rigid_transform(pm)
-            igt = self.rigid_transform.igt
-
-            if self.template_modifier is not None:
-                p0 = self.template_modifier(pm)
-            else:
-                p0 = pm
-
-            # p0: template, p1: source, igt: transform matrix from p0 to p1
-            return p0, p1, igt
+            template_all = self.dataset[0]
+            return p0, p1, igt, template_all  # p0 is source in inference
 
 
 class ShapeNet2(globset.Globset):
