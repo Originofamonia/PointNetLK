@@ -268,11 +268,10 @@ class Action:
         g_est = model.g  # [b, 4, 4], p1 -> p0
         # if epoch == args.epochs - 1:
         #     self.plot_pointcloud(g_est[0], p0[0], p1[0])
-        # p1_4 = torch.cat((p1[0], unipolar[0].unsqueeze(dim=-1)),
-        #                  dim=-1).float()
-        # rotated_p1_4 = self.transform(g_est, p1_4)
-        # print(rotated_p1_4[:, 0:3] - p0[0])
+
         loss_g = ptlk.pointlk.PointLK.comp(g_est, igt)
+        rotated_p1_4 = self.transform(g_est, p1[0])
+        print(rotated_p1_4[:, 0:3] - p0[0])
 
         if self._loss_type == 0:
             loss_r = ptlk.pointlk.PointLK.rsq(r)
