@@ -340,8 +340,8 @@ class Action:
             est_g = model.g
             desc = f'before_{i}'
             self.plot_pointcloud(p0[0], p1[0], desc=desc)  # plot before transform
-            # p0_4 = torch.cat((p0[0], unipolar0[0].unsqueeze(dim=-1)), dim=0)
             p1_4 = torch.cat((p1[0], unipolar1[0].unsqueeze(dim=-1)), dim=-1)
+            print(p1_4.type(), est_g[0].type())
             rotated_p1_4 = torch.matmul(p1_4, torch.inverse(est_g[0]))
             desc = f'after_{i}'
             self.plot_pointcloud(p0[0], rotated_p1_4, desc=desc)
