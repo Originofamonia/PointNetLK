@@ -345,7 +345,7 @@ class Action:
             self.plot_pointcloud(p0[0], p1[0], desc=desc)  # plot before transform
             p1_4 = torch.cat((p1[0], unipolar1[0].unsqueeze(dim=-1)), dim=-1).float()
             print(p1_4.size(), g_est.size())
-            rotated_p1_4 = self.transform(g_est, p1)
+            rotated_p1_4 = self.transform(g_est, p1[0])
             print(rotated_p1_4[:, 0:3] - p0[0])
             desc = f'after_{i}'
             self.plot_pointcloud(p0[0], rotated_p1_4, desc=desc)
