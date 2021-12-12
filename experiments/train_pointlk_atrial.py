@@ -320,7 +320,7 @@ class Action:
 
         # training
         LOGGER.debug('eval, begin')
-        model.eval()
+        model.train()
 
         for i, data in enumerate(testloader):
             source_all, template_all = data
