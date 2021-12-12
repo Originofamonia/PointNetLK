@@ -353,8 +353,8 @@ class Action:
         # g : SE(3),  bs x 4 x 4
         # a : R^4,    bs x N x 4
         g_ = g.view(-1, 4, 4)
-        R = g_[:, :, 0:3].contiguous().view(*(g.size()[0:-2]), 3, 3)
-        p = g_[:, :, 3].contiguous().view(*(g.size()[0:-2]), 3)
+        R = g_[:, :, 0:3].contiguous().view(*(g.size()[0:-2]), 4, 3)
+        p = g_[:, :, 3].contiguous().view(*(g.size()[0:-2]), 4)
         if len(g.size()) == len(a.size()):
             b = R.matmul(a) + p.unsqueeze(-1)
         else:
