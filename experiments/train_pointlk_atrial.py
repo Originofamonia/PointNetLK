@@ -256,7 +256,7 @@ class Action:
         return ave_vloss, ave_gloss
 
     def compute_loss(self, model, data):
-        p0, p1, igt, _,  _, _, _ = data
+        p0, p1, igt, unipolar, bipolar, af_type, re_af_type = data
         p0 = p0.to(self.args.device)  # template
         p1 = p1.to(self.args.device)  # source
         igt = igt.to(self.args.device)  # igt: p0 -> p1
@@ -268,7 +268,10 @@ class Action:
         g_est = model.g  # [b, 4, 4], p1 -> p0
         # if epoch == args.epochs - 1:
         #     self.plot_pointcloud(g_est[0], p0[0], p1[0])
-
+        # p1_4 = torch.cat((p1[0], unipolar[0].unsqueeze(dim=-1)),
+        #                  dim=-1).float()
+        # rotated_p1_4 = self.transform(g_est, p1_4)
+        # print(rotated_p1_4[:, 0:3] - p0[0])
         loss_g = ptlk.pointlk.PointLK.comp(g_est, igt)
 
         if self._loss_type == 0:
@@ -342,11 +345,10 @@ class Action:
             self.plot_pointcloud(p0[0], p1[0], desc=desc)  # plot before transform
             p1_4 = torch.cat((p1[0], unipolar1[0].unsqueeze(dim=-1)), dim=-1).float()
             print(p1_4.size(), g_est.size())
-            rotated_p1_4 = self.transform(g_est, p1_4)
+            rotated_p1_4 = self.transform(g_est, p1)
             print(rotated_p1_4[:, 0:3] - p0[0])
             desc = f'after_{i}'
             self.plot_pointcloud(p0[0], rotated_p1_4, desc=desc)
-
 
         LOGGER.debug('eval, end')
 
