@@ -120,6 +120,8 @@ class AtrialTransform(Dataset):
             p0 = self.template_modifier(pm)
         else:
             p0 = pm
+        # p0 = se3.transform(self.rigid_transform.gt.unsqueeze(0), p1) or
+        # p1 = se3.transform(self.rigid_transform.igt.unsqueeze(0), p0)
 
         # p0: template, p1: source, igt: transform matrix from p0 to p1
         if self.training:

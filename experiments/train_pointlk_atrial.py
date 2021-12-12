@@ -337,17 +337,29 @@ class Action:
                                                 self.p0_zero_mean,
                                                 self.p1_zero_mean)
 
-            est_g = model.g
+            g_est = model.g
             desc = f'before_{i}'
             self.plot_pointcloud(p0[0], p1[0], desc=desc)  # plot before transform
             p1_4 = torch.cat((p1[0], unipolar1[0].unsqueeze(dim=-1)), dim=-1).float()
-            # print(p1_4.type(), est_g[0].type())
-            rotated_p1_4 = torch.matmul(p1_4, est_g[0])
+            print(p1_4.size(), g_est.size())
+            rotated_p1_4 = self.transform(p1_4, g_est)
             desc = f'after_{i}'
             self.plot_pointcloud(p0[0], rotated_p1_4, desc=desc)
 
 
         LOGGER.debug('eval, end')
+
+    def transform(self, g, a):
+        # g : SE(3),  bs x 4 x 4
+        # a : R^4,    bs x N x 4
+        g_ = g.view(-1, 4, 4)
+        R = g_[:, :, 0:3].contiguous().view(*(g.size()[0:-2]), 3, 3)
+        p = g_[:, :, 3].contiguous().view(*(g.size()[0:-2]), 3)
+        if len(g.size()) == len(a.size()):
+            b = R.matmul(a) + p.unsqueeze(-1)
+        else:
+            b = R.matmul(a.unsqueeze(-1)).squeeze(-1) + p
+        return b
 
     def plot_pointcloud(self, p0, p1, desc):
 
