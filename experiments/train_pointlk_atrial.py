@@ -71,12 +71,11 @@ def options(argv=None):
     parser.add_argument('-l', '--logfile', default='', type=str,
                         metavar='LOGNAME',
                         help='path to logfile (default: null (no logging))')
-    parser.add_argument('-j', '--workers', default=4, type=int,
-                        metavar='N',
+    parser.add_argument('-j', '--workers', default=4, type=int, metavar='N',
                         help='number of data loading workers (default: 4)')
     parser.add_argument('-b', '--batch_size', default=1, type=int,
                         metavar='N', help='mini-batch size (default: 32)')
-    parser.add_argument('--epochs', default=10, type=int,
+    parser.add_argument('--epochs', default=1, type=int,
                         metavar='N', help='number of total epochs to run')
     parser.add_argument('--start_epoch', default=0, type=int, metavar='N',
                         help='manual epoch number (useful on restarts)')
@@ -95,7 +94,7 @@ def options(argv=None):
     return args
 
 
-def train(args, trainset, testset, action):
+def train_ptlk(args, trainset, testset, action):
     if not torch.cuda.is_available():
         args.device = 'cpu'
     args.device = torch.device(args.device)
@@ -135,14 +134,18 @@ def train(args, trainset, testset, action):
         min_loss = checkpoint['min_loss']
         optimizer.load_state_dict(checkpoint['optimizer'])
 
+    outfile = args.outfile
+    suffix = 'best'
     # training
     LOGGER.debug('train, begin')
     for epoch in range(args.start_epoch, args.epochs):
         # scheduler.step()
 
-        running_loss, running_info = action.train_1(model, trainloader,
-                                                    optimizer)
-        # val_loss, val_info = action.eval_1(model, testloader)
+        # running_loss, running_info = action.train_1(model, trainloader,
+        #                                             optimizer)
+        ckpt = torch.load(f'{outfile}_{suffix}.pt')
+        model.load_state_dict(ckpt)
+        val_loss, val_info = action.eval_1(model, trainloader)
 
         # is_best = val_loss < min_loss
         # min_loss = min(val_loss, min_loss)
@@ -156,7 +159,7 @@ def train(args, trainset, testset, action):
             #         'min_loss': min_loss,
             #         'optimizer': optimizer.state_dict(), }
             # save_checkpoint(snap, args.outfile, 'snap_best')
-        save_checkpoint(model.state_dict(), args.outfile, 'best')
+    save_checkpoint(model.state_dict(), args.outfile, 'best')
 
         # save_checkpoint(snap, args.outfile, 'snap_last')
         # save_checkpoint(model.state_dict(), args.outfile, 'model_last')
@@ -166,8 +169,8 @@ def train(args, trainset, testset, action):
     action.infer_plot(model, testset)
 
 
-def save_checkpoint(state, filename, suffix):
-    torch.save(state, f'{filename}_{suffix}.pt')
+def save_checkpoint(state, outfile, suffix):
+    torch.save(state, f'{outfile}_{suffix}.pt')
 
 
 class Action:
@@ -271,7 +274,7 @@ class Action:
 
         loss_g = ptlk.pointlk.PointLK.comp(g_est, igt)
         rotated_p1_4 = self.transform(g_est, p1[0])
-        print(rotated_p1_4[:, 0:3] - p0[0])
+        print(rotated_p1_4[:, 0:3] - p0[0])  # correct in train_1
 
         if self._loss_type == 0:
             loss_r = ptlk.pointlk.PointLK.rsq(r)
@@ -424,7 +427,7 @@ def main():
 
     # training
     act = Action(args)
-    train(args, trainset, testset, act)
+    train_ptlk(args, trainset, testset, act)
     args.resume = True
     LOGGER.debug('done (PID=%d)', os.getpid())
 
