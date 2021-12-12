@@ -265,11 +265,11 @@ class Action:
                                             self.p0_zero_mean,
                                             self.p1_zero_mean)
         # r = model(p0, p1, self.max_iter)
-        est_g = model.g  # [b, 4, 4]
+        g_est = model.g  # [b, 4, 4], p1 -> p0
         # if epoch == args.epochs - 1:
-        #     self.plot_pointcloud(est_g[0], p0[0], p1[0])
+        #     self.plot_pointcloud(g_est[0], p0[0], p1[0])
 
-        loss_g = ptlk.pointlk.PointLK.comp(est_g, igt)
+        loss_g = ptlk.pointlk.PointLK.comp(g_est, igt)
 
         if self._loss_type == 0:
             loss_r = ptlk.pointlk.PointLK.rsq(r)
@@ -320,7 +320,7 @@ class Action:
 
         # training
         LOGGER.debug('eval, begin')
-        model.eval()
+        model.train()
 
         for i, data in enumerate(testloader):
             source_all, template_all = data
@@ -337,15 +337,15 @@ class Action:
                                                 self.p0_zero_mean,
                                                 self.p1_zero_mean)
 
-            g_est = model.g
+            g_est = model.g  # p1 -> p0
             desc = f'before_{i}'
             self.plot_pointcloud(p0[0], p1[0], desc=desc)  # plot before transform
-            p0_4 = torch.cat((p0[0], unipolar0[0].unsqueeze(dim=-1)), dim=-1).float()
-            print(p0_4.size(), g_est.size())
-            rotated_p0_4 = self.transform(g_est, p0_4)
-            print(rotated_p0_4[:, 0:3] - p1[0])
+            p1_4 = torch.cat((p1[0], unipolar1[0].unsqueeze(dim=-1)), dim=-1).float()
+            print(p1_4.size(), g_est.size())
+            rotated_p1_4 = self.transform(g_est, p1_4)
+            print(rotated_p1_4[:, 0:3] - p0[0])
             desc = f'after_{i}'
-            self.plot_pointcloud(p0[0], rotated_p0_4, desc=desc)
+            self.plot_pointcloud(p0[0], rotated_p1_4, desc=desc)
 
 
         LOGGER.debug('eval, end')
