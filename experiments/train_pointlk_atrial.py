@@ -350,6 +350,7 @@ class Action:
             print(p1_4.size(), g_est.size())
             rotated_p1_4 = self.transform(g_est, p1[0])
             print(rotated_p1_4[:, 0:3] - p0[0])
+            print(p1[0] - p0[0])
             desc = f'after_{i}'
             self.plot_pointcloud(p0[0], rotated_p1_4, desc=desc)
 
