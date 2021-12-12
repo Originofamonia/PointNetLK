@@ -320,7 +320,7 @@ class Action:
 
         # training
         LOGGER.debug('eval, begin')
-        model.train()
+        model.eval()
 
         for i, data in enumerate(testloader):
             source_all, template_all = data
@@ -360,8 +360,9 @@ class Action:
         fig = plt.figure(figsize=(8, 8))
         ax = fig.add_subplot(111, projection='3d')
 
-        ax.scatter(p1[:, 0], p1[:, 1], p1[:, 2], c='b')
-        ax.scatter(p0[:, 0], p0[:, 1], p0[:, 2], c='r')
+        ax.scatter(p1[:, 0], p1[:, 1], p1[:, 2], c='b', label='source')
+        ax.scatter(p0[:, 0], p0[:, 1], p0[:, 2], c='r', label='template')
+        ax.legend()
         plt.savefig(f'{desc}.jpg')
 
 
