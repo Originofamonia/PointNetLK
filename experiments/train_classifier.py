@@ -189,7 +189,7 @@ class Action:
                                                  self.dim_k)
 
     def train_1(self, model, trainloader, optimizer, device):
-        model.train_ptlk()
+        model.train()
         vloss = 0.0
         pred = 0.0
         count = 0

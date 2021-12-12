@@ -179,7 +179,7 @@ class PointLK(torch.nn.Module):
             # probably, self.dt is way too small...
             f1 = self.ptnet(p1)  # [B, N, 3] -> [B, K]
             r = f1 - f0
-            self.ptnet.train_ptlk(training)
+            self.ptnet.train(training)
             return r, g, itr
 
         itr = 0
@@ -209,5 +209,5 @@ class PointLK(torch.nn.Module):
         rep = len(range(itr, maxiter))
         self.g_series[(itr + 1):] = g.clone().unsqueeze(0).repeat(rep, 1, 1, 1)
 
-        self.ptnet.train_ptlk(training)
+        self.ptnet.train(training)
         return r, g, (itr + 1)

@@ -223,7 +223,7 @@ class Action:
         return ptlk.pointlk.PointLK(ptnet, self.delta, self.learn_delta)
 
     def train_1(self, model, trainloader, optimizer, device):
-        model.train_ptlk()
+        model.train()
         vloss = 0.0
         gloss = 0.0
         count = 0
