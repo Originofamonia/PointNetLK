@@ -352,13 +352,15 @@ class Action:
     def transform(self, g, a):
         # g : SE(3),  bs x 4 x 4
         # a : R^4,    bs x N x 4
-        g_ = g.view(-1, 4, 4)
-        R = g_[:, :, 0:3].contiguous().view(*(g.size()[0:-2]), 4, 3)
-        p = g_[:, :, 3].contiguous().view(*(g.size()[0:-2]), 4)
-        if len(g.size()) == len(a.size()):
-            b = R.matmul(a) + p.unsqueeze(-1)
-        else:
-            b = R.matmul(a.unsqueeze(-1)).squeeze(-1) + p
+        # g_ = g.view(-1, 4, 4)
+        # R = g_[:, :, 0:3].contiguous().view(*(g.size()[0:-2]), 4, 3)
+        # p = g_[:, :, 3].contiguous().view(*(g.size()[0:-2]), 4)
+        # if len(g.size()) == len(a.size()):
+        #     b = R.matmul(a) + p.unsqueeze(-1)
+        # else:
+        #     b = R.matmul(a.unsqueeze(-1)).squeeze(-1) + p
+
+        b = g.matmul(a.unsqueeze(-1))
         return b
 
     def plot_pointcloud(self, p0, p1, desc):
