@@ -361,7 +361,7 @@ class Action:
         # else:
         #     b = R.matmul(a.unsqueeze(-1)).squeeze(-1) + p
 
-        b = g.matmul(a.unsqueeze(-1))
+        b = g.matmul(a.unsqueeze(-1)).squeeze(-1)
         return b
 
     def plot_pointcloud(self, p0, p1, desc):
