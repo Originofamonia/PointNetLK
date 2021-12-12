@@ -136,16 +136,17 @@ def train_ptlk(args, trainset, testset, action):
 
     outfile = args.outfile
     suffix = 'best'
+    ckpt = torch.load(f'{outfile}_{suffix}.pt')
+    model.load_state_dict(ckpt)
     # training
     LOGGER.debug('train, begin')
-    for epoch in range(args.start_epoch, args.epochs):
+    # for epoch in range(args.start_epoch, args.epochs):
         # scheduler.step()
 
         # running_loss, running_info = action.train_1(model, trainloader,
         #                                             optimizer)
-        ckpt = torch.load(f'{outfile}_{suffix}.pt')
-        model.load_state_dict(ckpt)
-        val_loss, val_info = action.eval_1(model, trainloader)
+
+        # val_loss, val_info = action.eval_1(model, trainloader)
 
         # is_best = val_loss < min_loss
         # min_loss = min(val_loss, min_loss)
@@ -159,7 +160,7 @@ def train_ptlk(args, trainset, testset, action):
             #         'min_loss': min_loss,
             #         'optimizer': optimizer.state_dict(), }
             # save_checkpoint(snap, args.outfile, 'snap_best')
-    save_checkpoint(model.state_dict(), args.outfile, 'best')
+    # save_checkpoint(model.state_dict(), args.outfile, 'best')
 
         # save_checkpoint(snap, args.outfile, 'snap_last')
         # save_checkpoint(model.state_dict(), args.outfile, 'model_last')
@@ -273,8 +274,8 @@ class Action:
         #     self.plot_pointcloud(g_est[0], p0[0], p1[0])
 
         loss_g = ptlk.pointlk.PointLK.comp(g_est, igt)
-        rotated_p1_4 = self.transform(g_est, p1[0])
-        print(rotated_p1_4[:, 0:3] - p0[0])  # correct in train_1
+        # rotated_p1_4 = self.transform(g_est, p1[0])
+        # print(rotated_p1_4[:, 0:3] - p0[0])  # correct in train_1
 
         if self._loss_type == 0:
             loss_r = ptlk.pointlk.PointLK.rsq(r)
