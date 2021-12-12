@@ -326,7 +326,7 @@ class Action:
 
         # training
         LOGGER.debug('eval, begin')
-        model.train()
+        model.eval()
 
         for i, data in enumerate(testloader):
             source_all, template_all = data
@@ -338,7 +338,7 @@ class Action:
             # p1 = p1.to(self.args.device)  # source
             # igt = igt.to(self.args.device)  # igt: p0 -> p1
             r = ptlk.pointlk.PointLK.do_forward(model, p0, p1,
-                                                self.args.max_iter,
+                                                1,
                                                 self.xtol,
                                                 self.p0_zero_mean,
                                                 self.p1_zero_mean)
