@@ -190,7 +190,7 @@ class Action:
         # self.delta = args.delta
         # self.learn_delta = args.learn_delta
         # self.max_iter = args.max_iter
-        self.xtol = 1.0e-7
+        self.xtol = 1.0e-7  # t_i in paper
         self.p0_zero_mean = True
         self.p1_zero_mean = True
 
