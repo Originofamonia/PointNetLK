@@ -152,7 +152,7 @@ class PointLK(torch.nn.Module):
 
         g = g0
         self.g_series = torch.zeros(maxiter + 1, *g0.size(), dtype=g0.dtype)
-        print(*g0.size())  # self.g_series is [maxiter + 1, 1, 4, 4]
+        # self.g_series is [maxiter + 1, 1, 4, 4], * is unpacking operator
         self.g_series[0] = g0.clone()
 
         if training:
