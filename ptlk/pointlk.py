@@ -54,8 +54,8 @@ class PointLK(torch.nn.Module):
     def do_forward(net, p0, p1, maxiter=10, xtol=1.0e-7, p0_zero_mean=True,
                    p1_zero_mean=True):
         """
-        p0: source
-        p1: template
+        p0: source, [B, N1, 3]
+        p1: template, [B, N2, 3]
         template -> source
         """
         a0 = torch.eye(4).view(1, 4, 4).expand(p0.size(0), 4, 4).to(
