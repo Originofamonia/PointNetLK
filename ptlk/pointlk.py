@@ -127,6 +127,7 @@ class PointLK(torch.nn.Module):
         num_points = p0.size(1)
 
         # compute transforms
+        # https://en.wikipedia.org/wiki/Rigid_transformation
         transf = torch.zeros(batch_size, 6, 4, 4).to(p0)
         for b in range(p0.size(0)):
             d = torch.diag(dt[b, :])  # [6, 6]
@@ -165,7 +166,7 @@ class PointLK(torch.nn.Module):
         f0 = self.ptnet(p0)  # [B, N, 3] -> [B, K]
 
         # approx. J by finite difference
-        dt = self.dt.to(p0).expand(batch_size, 6)
+        dt = self.dt.to(p0).expand(batch_size, 6)  # [B, 6] of delta
         J = self.approx_Jic(p0, f0, dt)
 
         self.last_err = None
