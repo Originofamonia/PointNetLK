@@ -105,6 +105,7 @@ class PointLK(torch.nn.Module):
         """
         g0 = torch.eye(4).to(p0).view(1, 4, 4).expand(p0.size(0), 4,
                                                       4).contiguous()
+        # g0: [B, 4, 4], eye
         r, g, itr = self.iclk(g0, p0, p1, maxiter, xtol)
 
         self.g = g
