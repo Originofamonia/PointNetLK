@@ -100,7 +100,9 @@ class PointLK(torch.nn.Module):
         return r
 
     def forward(self, p0, p1, maxiter=10, xtol=1.0e-7):
-        print(p0.size(), p1.size(), maxiter, xtol)
+        """
+        p0, p1: zero meant p0 and p1
+        """
         g0 = torch.eye(4).to(p0).view(1, 4, 4).expand(p0.size(0), 4,
                                                       4).contiguous()
         r, g, itr = self.iclk(g0, p0, p1, maxiter, xtol)
