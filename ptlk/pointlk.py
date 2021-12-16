@@ -76,7 +76,7 @@ class PointLK(torch.nn.Module):
             q1 = p1 - p1_m.unsqueeze(1)
         else:
             q1 = p1
-
+        # r is []
         r = net(q0, q1, maxiter=maxiter, xtol=xtol)
 
         if p0_zero_mean or p1_zero_mean:
