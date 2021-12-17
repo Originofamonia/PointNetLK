@@ -207,8 +207,8 @@ class Action:
         return self.create_from_pointnet_features(ptnet)
 
     def create_pointnet_features(self):
-        ptnet = ptlk.pointnet.PointNet_features(self.dim_k, use_tnet=False,
-                                                sym_fn=self.sym_fn)
+        ptnet = ptlk.pointnet.PointNetFeatures(self.dim_k, use_tnet=False,
+                                               sym_fn=self.sym_fn)
         if self.transfer_from and os.path.isfile(self.transfer_from):
             ptnet.load_state_dict(
                 torch.load(self.transfer_from, map_location='cpu'))

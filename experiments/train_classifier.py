@@ -183,8 +183,8 @@ class Action:
             self.sym_fn = ptlk.pointnet.symfn_avg
 
     def create_model(self):
-        feat = ptlk.pointnet.PointNet_features(self.dim_k, self.use_tnet,
-                                               self.sym_fn)
+        feat = ptlk.pointnet.PointNetFeatures(self.dim_k, self.use_tnet,
+                                              self.sym_fn)
         return ptlk.pointnet.PointNet_classifier(self.num_classes, feat,
                                                  self.dim_k)
 

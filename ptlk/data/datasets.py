@@ -115,7 +115,7 @@ class AtrialTransform(Dataset):
         else:
             p1 = self.rigid_transform(pm)
         igt = self.rigid_transform.igt
-
+        # https://en.wikipedia.org/wiki/Rigid_transformation
         if self.template_modifier is not None:
             p0 = self.template_modifier(pm)
         else:

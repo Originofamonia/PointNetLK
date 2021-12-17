@@ -64,7 +64,7 @@ def options(argv=None):
     parser.add_argument('--delta', default=1.0e-2, type=float, metavar='D',
                         help='step size for approx. Jacobian (default: 1.0e-2)')
     parser.add_argument('--learn_delta', dest='learn_delta',
-                        action='store_true',
+                        default=False,
                         help='flag for training step size delta')
 
     # settings for on training
@@ -201,8 +201,8 @@ class Action:
         return self.create_from_pointnet_features(ptnet)
 
     def create_pointnet_features(self):
-        ptnet = ptlk.pointnet.PointNet_features(self.args.dim_k, use_tnet=False,
-                                                sym_fn=self.sym_fn)
+        ptnet = ptlk.pointnet.PointNetFeatures(self.args.dim_k, use_tnet=False,
+                                               sym_fn=self.sym_fn)
         if self.args.transfer_from and os.path.isfile(self.args.transfer_from):
             ptnet.load_state_dict(
                 torch.load(self.args.transfer_from, map_location='cpu'))
@@ -268,7 +268,7 @@ class Action:
                                             self.xtol,
                                             self.p0_zero_mean,
                                             self.p1_zero_mean)
-        # r = model(p0, p1, self.max_iter)
+
         g_est = model.g  # [b, 4, 4], p1 -> p0
         # if epoch == args.epochs - 1:
         #     self.plot_pointcloud(g_est[0], p0[0], p1[0])

@@ -12,7 +12,7 @@ from . import se3, so3, invmat
 class PointLK(torch.nn.Module):
     def __init__(self, ptnet, delta=1.0e-2, learn_delta=False):
         super().__init__()
-        self.ptnet = ptnet
+        self.ptnet = ptnet  # PointNet_features
         self.inverse = invmat.InvMatrix.apply
         self.exp = se3.Exp  # [B, 6] -> [B, 4, 4]
         self.transform = se3.transform  # [B, 1, 4, 4] x [B, N, 3] -> [B, N, 3]
@@ -54,8 +54,8 @@ class PointLK(torch.nn.Module):
     def do_forward(net, p0, p1, maxiter=10, xtol=1.0e-7, p0_zero_mean=True,
                    p1_zero_mean=True):
         """
-        p0: source, [B, N1, 3]
-        p1: template, [B, N2, 3]
+        p0: template, [B, N1, 3]
+        p1: source, [B, N2, 3]
         template -> source
         """
         a0 = torch.eye(4).view(1, 4, 4).expand(p0.size(0), 4, 4).to(
@@ -127,7 +127,6 @@ class PointLK(torch.nn.Module):
         num_points = p0.size(1)
 
         # compute transforms
-        # https://en.wikipedia.org/wiki/Rigid_transformation
         transf = torch.zeros(batch_size, 6, 4, 4).to(p0)
         for b in range(p0.size(0)):
             d = torch.diag(dt[b, :])  # [6, 6]
@@ -163,7 +162,7 @@ class PointLK(torch.nn.Module):
         self.ptnet.eval()  # and fix them.
 
         # re-calc. with current modules
-        f0 = self.ptnet(p0)  # [B, N, 3] -> [B, K]
+        f0 = self.ptnet(p0)  # [B, N, 3] -> [B, K], K = 1024
 
         # approx. J by finite difference
         dt = self.dt.to(p0).expand(batch_size, 6)  # [B, 6] of delta

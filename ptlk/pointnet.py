@@ -1,8 +1,8 @@
 """ PointNet
-    References.
-        .. [1] Charles R. Qi, Hao Su, Kaichun Mo and Leonidas J. Guibas,
-        "PointNet: Deep Learning on Point Sets for 3D Classification and Segmentation",
-        CVPR (2017)
+References.
+.. [1] Charles R. Qi, Hao Su, Kaichun Mo and Leonidas J. Guibas,
+"PointNet: Deep Learning on Point Sets for 3D Classification and Segmentation",
+CVPR (2017)
 """
 
 import torch
@@ -107,7 +107,7 @@ class TNet(torch.nn.Module):
         return x
 
 
-class PointNet_features(torch.nn.Module):
+class PointNetFeatures(torch.nn.Module):
     def __init__(self, dim_k=1024, use_tnet=False, sym_fn=symfn_max, scale=1):
         super().__init__()
         mlp_h1 = [int(64 / scale), int(64 / scale)]
