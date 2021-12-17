@@ -113,7 +113,11 @@ class PointLK(torch.nn.Module):
         return r
 
     def update(self, g, dx):
-        # [B, 4, 4] x [B, 6] -> [B, 4, 4]
+        """
+        g: [B, 4, 4]
+        dx: [B, 6]
+        [B, 4, 4] x [B, 6] -> [B, 4, 4]
+        """
         dg = self.exp(dx)
         return dg.matmul(g)
 
@@ -198,9 +202,9 @@ class PointLK(torch.nn.Module):
             p = self.transform(g.unsqueeze(1),
                                p1)  # [B, 1, 4, 4] x [B, N, 3] -> [B, N, 3]
             f = self.ptnet(p)  # [B, N, 3] -> [B, K]
-            r = f - f0
+            r = f - f0  # [B, K]
 
-            dx = -pinv.bmm(r.unsqueeze(-1)).view(batch_size, 6)
+            dx = -pinv.bmm(r.unsqueeze(-1)).view(batch_size, 6)  # [B, 6]
 
             # DEBUG.
             # norm_r = r.norm(p=2, dim=1)
