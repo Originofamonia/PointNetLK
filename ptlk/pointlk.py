@@ -118,10 +118,13 @@ class PointLK(torch.nn.Module):
         return dg.matmul(g)
 
     def approx_Jic(self, p0, f0, dt):
-        # p0: [B, N, 3], Variable
-        # f0: [B, K], corresponding feature vector
-        # dt: [B, 6], Variable
-        # Jk = (ptnet(p(-delta[k], p0)) - f0) / delta[k]
+        """
+        eq4 in paper
+        p0: [B, N, 3], Variable
+        f0: [B, K], corresponding feature vector
+        dt: [B, 6], Variable
+        Jk = (ptnet(p(-delta[k], p0)) - f0) / delta[k]
+        """
 
         batch_size = p0.size(0)
         num_points = p0.size(1)
@@ -143,7 +146,7 @@ class PointLK(torch.nn.Module):
                                                        -1).transpose(1, 2)  # [B, K, 6]
 
         df = f0 - f  # [B, K, 6]
-        J = df / dt.unsqueeze(1)
+        J = df / dt.unsqueeze(1)  # [B, K, 6]
 
         return J
 
@@ -167,7 +170,7 @@ class PointLK(torch.nn.Module):
 
         # approx. J by finite difference
         dt = self.dt.to(p0).expand(batch_size, 6)  # [B, 6] of delta
-        J = self.approx_Jic(p0, f0, dt)
+        J = self.approx_Jic(p0, f0, dt)  # Ji for template
 
         self.last_err = None
         itr = -1
