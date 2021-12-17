@@ -138,6 +138,7 @@ class PointLK(torch.nn.Module):
 
         # f0 = self.ptnet(p0).unsqueeze(-1) # [B, K, 1]
         f0 = f0.unsqueeze(-1)  # [B, K, 1]
+        print(p.view(-1, num_points, 3).size())
         f = self.ptnet(p.view(-1, num_points, 3)).view(batch_size, 6,
                                                        -1).transpose(1, 2)  # [B, K, 6]
 
