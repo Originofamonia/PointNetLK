@@ -90,9 +90,9 @@ class PointLK(torch.nn.Module):
                 est_g = est_g.bmm(a1.to(est_g))
             net.g = est_g
 
-            est_gs = net.g_series  # [M, B, 4, 4], [2, 1, 4, 4]
+            est_gs = net.g_series  # [M, B, 4, 4], [maxiter + 1, 1, 4, 4]
             if p0_zero_mean:
-                print(a0.unsqueeze(0).size())
+                print(a0.unsqueeze(0).size())  # [1, B, 4, 4]
                 est_gs = a0.unsqueeze(0).contiguous().to(est_gs).matmul(est_gs)
             if p1_zero_mean:
                 est_gs = est_gs.matmul(a1.unsqueeze(0).contiguous().to(est_gs))

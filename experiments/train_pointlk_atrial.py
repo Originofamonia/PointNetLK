@@ -338,7 +338,7 @@ class Action:
             # p1 = p1.to(self.args.device)  # source
             # igt = igt.to(self.args.device)  # igt: p0 -> p1
             r = ptlk.pointlk.PointLK.do_forward(model, p0, p1,
-                                                1,
+                                                self.args.max_iter,
                                                 self.xtol,
                                                 self.p0_zero_mean,
                                                 self.p1_zero_mean)
