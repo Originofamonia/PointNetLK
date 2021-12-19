@@ -92,7 +92,7 @@ class PointLK(torch.nn.Module):
 
             est_gs = net.g_series  # [M, B, 4, 4], [2, 1, 4, 4]
             if p0_zero_mean:
-                print(a0.unsqueeze(0))
+                print(a0.unsqueeze(0).size())
                 est_gs = a0.unsqueeze(0).contiguous().to(est_gs).matmul(est_gs)
             if p1_zero_mean:
                 est_gs = est_gs.matmul(a1.unsqueeze(0).contiguous().to(est_gs))
@@ -146,7 +146,7 @@ class PointLK(torch.nn.Module):
 
         # f0 = self.ptnet(p0).unsqueeze(-1) # [B, K, 1]
         f0 = f0.unsqueeze(-1)  # [B, K, 1]
-        print(p.view(-1, num_points, 3).size())
+        # print(p.view(-1, num_points, 3).size())  # [6, N, 3]
         f = self.ptnet(p.view(-1, num_points, 3)).view(batch_size, 6,
                                                        -1).transpose(1, 2)  # [B, K, 6]
 
