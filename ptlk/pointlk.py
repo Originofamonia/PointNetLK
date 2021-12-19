@@ -90,8 +90,9 @@ class PointLK(torch.nn.Module):
                 est_g = est_g.bmm(a1.to(est_g))
             net.g = est_g
 
-            est_gs = net.g_series  # [M, B, 4, 4]
+            est_gs = net.g_series  # [M, B, 4, 4], [2, 1, 4, 4]
             if p0_zero_mean:
+                print(a0.unsqueeze(0))
                 est_gs = a0.unsqueeze(0).contiguous().to(est_gs).matmul(est_gs)
             if p1_zero_mean:
                 est_gs = est_gs.matmul(a1.unsqueeze(0).contiguous().to(est_gs))
@@ -110,7 +111,7 @@ class PointLK(torch.nn.Module):
 
         self.g = g
         self.itr = itr
-        return r
+        return r  # [B, K]
 
     def update(self, g, dx):
         """
@@ -118,8 +119,8 @@ class PointLK(torch.nn.Module):
         dx: [B, 6]
         [B, 4, 4] x [B, 6] -> [B, 4, 4]
         """
-        dg = self.exp(dx)
-        return dg.matmul(g)
+        dg = self.exp(dx)  # [B, 4, 4]
+        return dg.matmul(g)  # [B, 4, 4]
 
     def approx_Jic(self, p0, f0, dt):
         """
@@ -202,7 +203,7 @@ class PointLK(torch.nn.Module):
             p = self.transform(g.unsqueeze(1),
                                p1)  # [B, 1, 4, 4] x [B, N, 3] -> [B, N, 3]
             f = self.ptnet(p)  # [B, N, 3] -> [B, K]
-            r = f - f0  # [B, K]
+            r = f - f0  # [B, K], [...] of eq5
 
             dx = -pinv.bmm(r.unsqueeze(-1)).view(batch_size, 6)  # [B, 6]
 
@@ -216,8 +217,8 @@ class PointLK(torch.nn.Module):
                     self.last_err = 0  # no update.
                 break
 
-            g = self.update(g, dx)
-            self.g_series[itr + 1] = g.clone()
+            g = self.update(g, dx)  # [B, 4, 4], eq6
+            self.g_series[itr + 1] = g.clone()  # delta_G in eq6
 
         rep = len(range(itr, maxiter))
         self.g_series[(itr + 1):] = g.clone().unsqueeze(0).repeat(rep, 1, 1, 1)

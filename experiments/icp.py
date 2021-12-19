@@ -13,6 +13,7 @@
 import numpy as np
 from scipy.spatial import KDTree
 
+
 def _icp_find_rigid_transform(p_from, p_target):
     A, B = np.copy(p_from), np.copy(p_target)
 
@@ -28,12 +29,13 @@ def _icp_find_rigid_transform(p_from, p_target):
 
     # special reflection case
     if np.linalg.det(R) < 0:
-        Vt[2,:] *= -1
+        Vt[2, :] *= -1
         R = np.dot(Vt.T, U.T)
 
     t = np.dot(-R, centroid_A) + centroid_B
 
     return R, t
+
 
 def _icp_Rt_to_matrix(R, t):
     # matrix M = [R, t; 0, 1]
@@ -42,10 +44,12 @@ def _icp_Rt_to_matrix(R, t):
     M = np.concatenate((Rt, np.expand_dims(a, axis=0)), axis=0)
     return M
 
+
 class ICP:
     """ Estimate a rigid-body transform g such that:
         p0 = g.p1
     """
+
     def __init__(self, p0, p1):
         """ p0.shape == (N, 3)
             p1.shape == (N, 3)
@@ -62,7 +66,8 @@ class ICP:
         g = np.eye(dim_k + 1, dtype=self.p0.dtype)
         p = np.copy(self.p1)
 
-        self.g_series = np.zeros((max_iter + 1, dim_k + 1, dim_k + 1), dtype=g.dtype)
+        self.g_series = np.zeros((max_iter + 1, dim_k + 1, dim_k + 1),
+                                 dtype=g.dtype)
         self.g_series[0, :, :] = g
 
         itr = -1
@@ -81,10 +86,9 @@ class ICP:
             g = np.copy(new_g)
             self.g_series[itr + 1, :, :] = g
 
-        self.g_series[(itr+1):, :, :] = g
+        self.g_series[(itr + 1):, :, :] = g
 
         return g, p, (itr + 1)
-
 
 
 def icp_test():
@@ -101,10 +105,10 @@ def icp_test():
         [sin(-0.279), cos(-0.279), 0],
         [0, 0, 1]
     ])
-    #R = np.eye(3)
+    # R = np.eye(3)
 
     t = np.array([5.0, 20.0, 10.0])
-    #t = np.array([0.0, 0.0, 0.0])
+    # t = np.array([0.0, 0.0, 0.0])
 
     B = np.dot(R, A.T).T + t
     A = A.astype(B.dtype)
@@ -120,20 +124,22 @@ def icp_test():
     print(np.dot(-R.T, t))
 
     fig = plt.figure()
-    #ax = Axes3D(fig)
+    # ax = Axes3D(fig)
     ax = fig.add_subplot(111, projection='3d')
 
     ax.set_label("x - axis")
     ax.set_label("y - axis")
     ax.set_label("z - axis")
 
-    ax.plot(A[:,1], A[:,0], A[:,2], "o", color="#cccccc", ms=4, mew=0.5)
-    ax.plot(points[:,1], points[:,0], points[:,2], "o", color="#00cccc", ms=4, mew=0.5)
-    ax.plot(B[:,0], B[:,1], B[:,2], "o", color="#ff0000", ms=4, mew=0.5)
+    ax.plot(A[:, 1], A[:, 0], A[:, 2], "o", color="#cccccc", ms=4, mew=0.5)
+    ax.plot(points[:, 1], points[:, 0], points[:, 2], "o", color="#00cccc",
+            ms=4, mew=0.5)
+    ax.plot(B[:, 0], B[:, 1], B[:, 2], "o", color="#ff0000", ms=4, mew=0.5)
 
     plt.show()
+
 
 if __name__ == '__main__':
     icp_test()
 
-#EOF
+# EOF

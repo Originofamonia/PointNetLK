@@ -127,7 +127,9 @@ def group_prod(g, h):
 
 
 class ExpMap(torch.autograd.Function):
-    """ Exp: se(3) -> SE(3)
+    """
+    Exp: se(3) -> SE(3)
+    eq1 in paper
     """
 
     @staticmethod
