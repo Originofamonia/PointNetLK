@@ -76,8 +76,8 @@ class PointLK(torch.nn.Module):
             q1 = p1 - p1_m.unsqueeze(1)
         else:
             q1 = p1
-        # r is []
-        r = net(q0, q1, maxiter=maxiter, xtol=xtol)
+
+        r = net(q0, q1, maxiter=maxiter, xtol=xtol)  # [B, K]
 
         if p0_zero_mean or p1_zero_mean:
             # output' = trans(p0_m) * output * trans(-p1_m)
@@ -93,7 +93,7 @@ class PointLK(torch.nn.Module):
             est_gs = net.g_series  # [M, B, 4, 4], [maxiter + 1, 1, 4, 4]
             if p0_zero_mean:
                 print(a0.unsqueeze(0).size())  # [1, B, 4, 4]
-                est_gs = a0.unsqueeze(0).contiguous().to(est_gs).matmul(est_gs)
+                est_gs = a0.unsqueeze(0).contiguous().to(est_gs).matmul(est_gs)  # [maxiter + 1, 1, 4, 4]
             if p1_zero_mean:
                 est_gs = est_gs.matmul(a1.unsqueeze(0).contiguous().to(est_gs))
             net.g_series = est_gs
@@ -159,7 +159,7 @@ class PointLK(torch.nn.Module):
         training = self.ptnet.training
         batch_size = p0.size(0)
 
-        g = g0
+        g = g0  # only g is used to transform
         self.g_series = torch.zeros(maxiter + 1, *g0.size(), dtype=g0.dtype)
         # self.g_series is [maxiter + 1, 1, 4, 4], * is unpacking operator
         self.g_series[0] = g0.clone()
