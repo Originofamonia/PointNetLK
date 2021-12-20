@@ -329,30 +329,29 @@ class Action:
         model.eval()
 
         for i, data in enumerate(testloader):
-            source_all, template_all = data
+            source_all, template_all, p11, igt = data
             source_all = tuple(t.to(self.args.device) for t in source_all)
             template_all = tuple(t.to(self.args.device) for t in template_all)
             p0, unipolar0, bipolar0, af_type0, re_af_type0 = template_all
             p1, unipolar1, bipolar1, af_type1, re_af_type1 = source_all
             # p0 = p0.to(self.args.device)  # template
             # p1 = p1.to(self.args.device)  # source
-            # igt = igt.to(self.args.device)  # igt: p0 -> p1
-            r = ptlk.pointlk.PointLK.do_forward(model, p0, p1,
+            # igt = igt.to(self.args.device)  # igt: p0 -> p1, p1 = se3.transform(igt, p0)
+            r = ptlk.pointlk.PointLK.do_forward(model, p1, p11,
                                                 self.args.max_iter,
                                                 self.xtol,
                                                 self.p0_zero_mean,
                                                 self.p1_zero_mean)
 
-            g_est = model.g  # p1 -> p0
+            g_est = model.g  # p1 -> p0, p0 = se3.transform(g_est, p1)
             desc = f'before_{i}'
-            self.plot_pointcloud(p0[0], p1[0], desc=desc)  # plot before transform
-            p1_4 = torch.cat((p1[0], unipolar1[0].unsqueeze(dim=-1)), dim=-1).float()
-            print(p1_4.size(), g_est.size())
-            rotated_p1_4 = self.transform(g_est, p1[0])
-            print(rotated_p1_4[:, 0:3] - p0[0])
-            print(p1[0] - p0[0])
+            self.plot_pointcloud(p1[0], p11[0], desc=desc)  # plot before transform
+            p11_4 = torch.cat((p11[0], unipolar1[0].unsqueeze(dim=-1)), dim=-1).float()
+            print(p11_4.size(), g_est.size())
+            rotated_p11 = self.transform(g_est, p11[0])
+            print(rotated_p11[:, 0:3] - p1[0])
             desc = f'after_{i}'
-            self.plot_pointcloud(p0[0], rotated_p1_4, desc=desc)
+            self.plot_pointcloud(p0[0], rotated_p11, desc=desc)
 
         LOGGER.debug('eval, end')
 
@@ -373,7 +372,10 @@ class Action:
         return b
 
     def plot_pointcloud(self, p0, p1, desc):
-
+        """
+        p0: template
+        p1: source
+        """
         # p0_4 = torch.zeros(len(p0)).unsqueeze(1).to(p1)
         # p0_cat = torch.cat((p0, p0_4), dim=-1)
         p1 = p1.detach().cpu().numpy()

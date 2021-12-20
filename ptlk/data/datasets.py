@@ -39,7 +39,7 @@ class Atrial(Dataset):
         labels_df = pd.read_csv(f'{dataset_path}/label.csv')
         self.filtered_df = labels_df[labels_df['Study number'].isin(self.dirs)]  # total 8 samples
         # self.get_n_points()  # only need once
-        self.template_id = 0  # select 0 as the template for inference
+        # self.template_id = 0  # select 0 as the template for inference
         if training:
             self.study_ids = self.filtered_df['Study number'].values[1:5]
             self.af_labels = self.filtered_df['AF type'].values[1:5]
@@ -128,7 +128,7 @@ class AtrialTransform(Dataset):
             return p0, p1, igt, unipolar, bipolar, af_type, re_af_type
         else:
             template_all = self.dataset.get_template()
-            return (p0, unipolar, bipolar, af_type, re_af_type), template_all  # p0 is source in inference
+            return (p0, unipolar, bipolar, af_type, re_af_type), template_all, p1, igt  # p0 is source in inference
 
 
 class ShapeNet2(globset.Globset):
