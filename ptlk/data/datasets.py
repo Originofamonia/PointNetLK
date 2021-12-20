@@ -41,13 +41,13 @@ class Atrial(Dataset):
         # self.get_n_points()  # only need once
         # self.template_id = 0  # select 0 as the template for inference
         if training:
-            self.study_ids = self.filtered_df['Study number'].values[1:]
-            self.af_labels = self.filtered_df['AF type'].values[1:]
-            self.re_af_labels = self.filtered_df['1Y re AF'].values[1:]
+            self.study_ids = self.filtered_df['Study number'].values[:]
+            self.af_labels = self.filtered_df['AF type'].values[:]
+            self.re_af_labels = self.filtered_df['1Y re AF'].values[:]
         else:
-            self.study_ids = self.filtered_df['Study number'].values[1:]
-            self.af_labels = self.filtered_df['AF type'].values[1:]
-            self.re_af_labels = self.filtered_df['1Y re AF'].values[1:]
+            self.study_ids = self.filtered_df['Study number'].values[:]
+            self.af_labels = self.filtered_df['AF type'].values[:]
+            self.re_af_labels = self.filtered_df['1Y re AF'].values[:]
 
     def __getitem__(self, idx):
         study_id = self.study_ids[idx]
