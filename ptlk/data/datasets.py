@@ -53,7 +53,7 @@ class Atrial(Dataset):
         study_id = self.study_ids[idx]
         path = f'{self.dataset_path}/Cleaned_PatientData/{study_id}/{study_id}_eam_data.csv'
         df = pd.read_csv(path)
-        df = df.sample(n=406)
+        df = df.sample(n=406, replace=False)
         points = torch.from_numpy(np.float32(df[['x_norm', 'y_norm', 'z_norm']].values))
 
         unipolar = torch.from_numpy(df['unipolar'].values)
@@ -75,7 +75,7 @@ class Atrial(Dataset):
         study_id = self.filtered_df['Study number'].values[0]
         path = f'{self.dataset_path}/Cleaned_PatientData/{study_id}/{study_id}_eam_data.csv'
         df = pd.read_csv(path)
-        df = df.sample(n=206, replace=False)
+        df = df.sample(n=406, replace=False)
         points = torch.from_numpy(
             np.float32(df[['x_norm', 'y_norm', 'z_norm']].values))
 
