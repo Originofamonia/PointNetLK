@@ -7,7 +7,7 @@ import argparse
 import os
 import sys
 import logging
-import numpy
+import numpy as np
 import torch
 import torch.utils.data
 import torchvision
