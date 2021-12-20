@@ -75,7 +75,7 @@ def options(argv=None):
                         help='number of data loading workers (default: 4)')
     parser.add_argument('-b', '--batch_size', default=1, type=int,
                         metavar='N', help='mini-batch size (default: 32)')
-    parser.add_argument('--epochs', default=20, type=int,
+    parser.add_argument('--epochs', default=50, type=int,
                         metavar='N', help='number of total epochs to run')
     parser.add_argument('--start_epoch', default=0, type=int, metavar='N',
                         help='manual epoch number (useful on restarts)')
