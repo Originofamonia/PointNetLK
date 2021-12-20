@@ -59,7 +59,7 @@ def options(argv=None):
                         help='symmetric function (default: max)')
 
     # settings for LK
-    parser.add_argument('--max_iter', default=14, type=int,
+    parser.add_argument('--max_iter', default=20, type=int,
                         metavar='N', help='max-iter on LK. (default: 10)')
     parser.add_argument('--delta', default=1.0e-2, type=float, metavar='D',
                         help='step size for approx. Jacobian (default: 1.0e-2)')
@@ -73,7 +73,7 @@ def options(argv=None):
                         help='path to logfile (default: null (no logging))')
     parser.add_argument('-j', '--workers', default=4, type=int, metavar='N',
                         help='number of data loading workers (default: 4)')
-    parser.add_argument('-b', '--batch_size', default=1, type=int,
+    parser.add_argument('-b', '--batch_size', default=2, type=int,
                         metavar='N', help='mini-batch size (default: 32)')
     parser.add_argument('--epochs', default=50, type=int,
                         metavar='N', help='number of total epochs to run')
@@ -351,7 +351,7 @@ class Action:
             p11_4 = torch.cat((p11[0], unipolar1[0].unsqueeze(dim=-1)), dim=-1).float()
             # print(p11_4.size(), g_est.size())
             rotated_p11 = self.transform(g_est, p11[0])
-            print(rotated_p11[:, 0:3] - p1[0])
+            # print(rotated_p11[:, 0:3] - p1[0])
             desc = f'after_{i}'
             self.plot_pointcloud(p0[0], rotated_p11, desc=desc)
 
