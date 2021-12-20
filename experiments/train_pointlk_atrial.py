@@ -135,16 +135,16 @@ def train_ptlk(args, trainset, testset, action):
         optimizer.load_state_dict(checkpoint['optimizer'])
 
     outfile = args.outfile
-    suffix = 'best'
-    ckpt = torch.load(f'{outfile}_{suffix}.pt')
-    model.load_state_dict(ckpt)
+    # suffix = 'best'
+    # ckpt = torch.load(f'{outfile}_{suffix}.pt')
+    # model.load_state_dict(ckpt)
     # training
     LOGGER.debug('train, begin')
-    # for epoch in range(args.start_epoch, args.epochs):
+    for epoch in range(args.start_epoch, args.epochs):
         # scheduler.step()
 
-        # running_loss, running_info = action.train_1(model, trainloader,
-        #                                             optimizer)
+        running_loss, running_info = action.train_1(model, trainloader,
+                                                    optimizer)
 
         # val_loss, val_info = action.eval_1(model, trainloader)
 
