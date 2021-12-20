@@ -332,6 +332,8 @@ class Action:
             source_all, template_all, p11, igt = data
             source_all = tuple(t.to(self.args.device) for t in source_all)
             template_all = tuple(t.to(self.args.device) for t in template_all)
+            p11 = p11.to(self.args.device)
+            igt = igt.to(self.args.device)
             p0, unipolar0, bipolar0, af_type0, re_af_type0 = template_all
             p1, unipolar1, bipolar1, af_type1, re_af_type1 = source_all
             # p0 = p0.to(self.args.device)  # template
