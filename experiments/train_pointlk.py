@@ -61,7 +61,7 @@ def options(argv=None):
                         help='symmetric function (default: max)')
 
     # settings for LK
-    parser.add_argument('--max-iter', default=10, type=int,
+    parser.add_argument('--max-iter', default=20, type=int,
                         metavar='N', help='max-iter on LK. (default: 10)')
     parser.add_argument('--delta', default=1.0e-2, type=float,
                         metavar='D',
@@ -79,7 +79,7 @@ def options(argv=None):
                         help='number of data loading workers (default: 4)')
     parser.add_argument('-b', '--batch-size', default=16, type=int,
                         metavar='N', help='mini-batch size (default: 32)')
-    parser.add_argument('--epochs', default=200, type=int,
+    parser.add_argument('--epochs', default=500, type=int,
                         metavar='N', help='number of total epochs to run')
     parser.add_argument('--start-epoch', default=0, type=int,
                         metavar='N',
