@@ -27,7 +27,7 @@ def options(argv=None):
 
     # required.
     parser.add_argument('-o', '--outfile', type=str,
-                        default='/home/qiyuan/2021fall/PointNetLK/outputs/modelnet.pt',
+                        default='/home/qiyuan/2021fall/PointNetLK/outputs/modelnet10',
                         help='output filename (prefix)')  # the result: ${BASENAME}_model_best.pth
     parser.add_argument('-i', '--dataset_path', type=str,
                         default='/home/qiyuan/2021fall/PointNetLK/modelnet10/ModelNet10',
@@ -178,7 +178,7 @@ def run(args, trainset, testset, action):
 
 
 def save_checkpoint(state, filename, suffix):
-    torch.save(state, '{}_{}.pth'.format(filename, suffix))
+    torch.save(state, '{}_{}.pt'.format(filename, suffix))
 
 
 class Action:
