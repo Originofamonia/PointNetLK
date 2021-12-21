@@ -59,7 +59,7 @@ def options(argv=None):
                         help='symmetric function (default: max)')
 
     # settings for LK
-    parser.add_argument('--max_iter', default=20, type=int,
+    parser.add_argument('--max_iter', default=14, type=int,
                         metavar='N', help='max-iter on LK. (default: 10)')
     parser.add_argument('--delta', default=1.0e-2, type=float, metavar='D',
                         help='step size for approx. Jacobian (default: 1.0e-2)')
@@ -73,9 +73,9 @@ def options(argv=None):
                         help='path to logfile (default: null (no logging))')
     parser.add_argument('-j', '--workers', default=4, type=int, metavar='N',
                         help='number of data loading workers (default: 4)')
-    parser.add_argument('-b', '--batch_size', default=2, type=int,
+    parser.add_argument('-b', '--batch_size', default=1, type=int,
                         metavar='N', help='mini-batch size (default: 32)')
-    parser.add_argument('--epochs', default=50, type=int,
+    parser.add_argument('--epochs', default=0, type=int,
                         metavar='N', help='number of total epochs to run')
     parser.add_argument('--start_epoch', default=0, type=int, metavar='N',
                         help='manual epoch number (useful on restarts)')
@@ -85,7 +85,7 @@ def options(argv=None):
     parser.add_argument('--resume', default='', type=str, metavar='PATH',
                         help='path to latest checkpoint (default: null (no-use))')
     parser.add_argument('--pretrained', type=str,
-                        default='/home/qiyuan/2021fall/PointNetLK/outputs/modelnet10_model_last_16.pt',
+                        default='/home/qiyuan/2021fall/PointNetLK/outputs/modelnet10_model_best_200.pt',
                         help='path to pretrained model file (default: null (no-use))')
     parser.add_argument('--device', default='cuda', type=str,
                         metavar='DEVICE', help='use CUDA if available')
