@@ -5,7 +5,7 @@ import numpy as np
 import torch
 import torch.utils.data
 
-from . import mesh
+# from . import mesh
 from .. import so3
 from .. import se3
 

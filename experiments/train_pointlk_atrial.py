@@ -85,7 +85,7 @@ def options(argv=None):
     parser.add_argument('--resume', default='', type=str, metavar='PATH',
                         help='path to latest checkpoint (default: null (no-use))')
     parser.add_argument('--pretrained', type=str,
-                        default='/home/qiyuan/2021fall/PointNetLK/outputs/modelnet10_model_best.pt',
+                        default='/home/qiyuan/2021fall/PointNetLK/outputs/modelnet10_model_last.pt',
                         help='path to pretrained model file (default: null (no-use))')
     parser.add_argument('--device', default='cuda', type=str,
                         metavar='DEVICE', help='use CUDA if available')
