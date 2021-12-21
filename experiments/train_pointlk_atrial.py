@@ -85,7 +85,7 @@ def options(argv=None):
     parser.add_argument('--resume', default='', type=str, metavar='PATH',
                         help='path to latest checkpoint (default: null (no-use))')
     parser.add_argument('--pretrained', type=str,
-                        default='/home/qiyuan/2021fall/PointNetLK/outputs/modelnet10_model_last.pt',
+                        default='/home/qiyuan/2021fall/PointNetLK/outputs/modelnet10_model_last_16.pt',
                         help='path to pretrained model file (default: null (no-use))')
     parser.add_argument('--device', default='cuda', type=str,
                         metavar='DEVICE', help='use CUDA if available')
@@ -325,7 +325,7 @@ class Action:
             # p0 = p0.to(self.args.device)  # template
             # p1 = p1.to(self.args.device)  # source
             # igt = igt.to(self.args.device)  # igt: p0 -> p1, p1 = se3.transform(igt, p0)
-            r = ptlk.pointlk.PointLK.do_forward(model, p1, p11,
+            r = ptlk.pointlk.PointLK.do_forward(model, p0, p1,
                                                 self.args.max_iter,
                                                 self.xtol,
                                                 self.p0_zero_mean,
@@ -333,13 +333,13 @@ class Action:
 
             g_est = model.g  # p1 -> p0, p0 = se3.transform(g_est, p1)
             desc = f'before_{i}'
-            self.plot_pointcloud(p1[0], p11[0], desc=desc)  # plot before transform
-            p11_4 = torch.cat((p11[0], unipolar1[0].unsqueeze(dim=-1)), dim=-1).float()
+            self.plot_pointcloud(p0[0], p1[0], desc=desc)  # plot before transform
+            p11_4 = torch.cat((p1[0], unipolar1[0].unsqueeze(dim=-1)), dim=-1).float()
             # print(p11_4.size(), g_est.size())
-            rotated_p11 = self.transform(g_est, p11[0])
-            # print(rotated_p11[:, 0:3] - p1[0])
+            rotated_p1 = self.transform(g_est, p1[0])
+            # print(rotated_p1[:, 0:3] - p1[0])
             desc = f'after_{i}'
-            self.plot_pointcloud(p1[0], rotated_p11, desc=desc)
+            self.plot_pointcloud(p0[0], rotated_p1, desc=desc)
 
         LOGGER.debug('eval, end')
 
