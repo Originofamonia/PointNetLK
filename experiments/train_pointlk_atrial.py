@@ -305,20 +305,6 @@ class Action:
 
         LOGGER.debug('Trainer (PID=%d), %s', os.getpid(),)
 
-        # model = action.create_model()
-        # if self.args.pretrained:
-        #     assert os.path.isfile(self.args.pretrained)
-        #     model.load_state_dict(
-        #         torch.load(self.args.pretrained, map_location='cpu'))
-        # model.to(self.args.device)
-
-        checkpoint = None
-        if self.args.resume:
-            assert os.path.isfile(self.args.resume)
-            checkpoint = torch.load(self.args.resume)
-            self.args.start_epoch = checkpoint['epoch']
-            model.load_state_dict(checkpoint['model'])
-
         # dataloader
         testloader = torch.utils.data.DataLoader(
             testset,
@@ -353,7 +339,7 @@ class Action:
             rotated_p11 = self.transform(g_est, p11[0])
             # print(rotated_p11[:, 0:3] - p1[0])
             desc = f'after_{i}'
-            self.plot_pointcloud(p0[0], rotated_p11, desc=desc)
+            self.plot_pointcloud(p1[0], rotated_p11, desc=desc)
 
         LOGGER.debug('eval, end')
 
