@@ -162,15 +162,15 @@ def run(args, trainset, testset, action):
 
         LOGGER.info('epoch, %04d, %f, %f, %f, %f', epoch + 1, running_loss,
                     val_loss, running_info, val_info)
-        snap = {'epoch': epoch + 1,
-                'model': model.state_dict(),
-                'min_loss': min_loss,
-                'optimizer': optimizer.state_dict(), }
+        # snap = {'epoch': epoch + 1,
+        #         'model': model.state_dict(),
+        #         'min_loss': min_loss,
+        #         'optimizer': optimizer.state_dict(), }
         if is_best:
-            save_checkpoint(snap, args.outfile, 'snap_best')
+            # save_checkpoint(snap, args.outfile, 'snap_best')
             save_checkpoint(model.state_dict(), args.outfile, 'model_best')
 
-        save_checkpoint(snap, args.outfile, 'snap_last')
+        # save_checkpoint(snap, args.outfile, 'snap_last')
         save_checkpoint(model.state_dict(), args.outfile, 'model_last')
 
     LOGGER.debug('train, end')

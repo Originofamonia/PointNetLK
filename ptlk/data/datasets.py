@@ -31,7 +31,7 @@ class Atrial(Dataset):
     """ atrial dataset """
 
     def __init__(self, dataset_path, training=True, transform=None):
-        loader = mesh.offread
+        # loader = mesh.offread
         self.dataset_path = dataset_path
         self.transform = transform
         self.training = training
@@ -45,9 +45,9 @@ class Atrial(Dataset):
             self.af_labels = self.filtered_df['AF type'].values[:]
             self.re_af_labels = self.filtered_df['1Y re AF'].values[:]
         else:
-            self.study_ids = self.filtered_df['Study number'].values[:]
-            self.af_labels = self.filtered_df['AF type'].values[:]
-            self.re_af_labels = self.filtered_df['1Y re AF'].values[:]
+            self.study_ids = self.filtered_df['Study number'].values[1:]
+            self.af_labels = self.filtered_df['AF type'].values[1:]
+            self.re_af_labels = self.filtered_df['1Y re AF'].values[1:]
 
     def __getitem__(self, idx):
         study_id = self.study_ids[idx]
