@@ -74,7 +74,7 @@ def options(argv=None):
                         help='number of data loading workers (default: 4)')
     parser.add_argument('-b', '--batch_size', default=1, type=int,
                         metavar='N', help='mini-batch size (default: 32)')
-    parser.add_argument('--epochs', default=1, type=int,
+    parser.add_argument('--epochs', default=10, type=int,
                         metavar='N', help='number of total epochs to run')
     parser.add_argument('--start_epoch', default=0, type=int, metavar='N',
                         help='manual epoch number (useful on restarts)')
@@ -298,8 +298,8 @@ class Action:
         """
         infer on training & test sets to plot point cloud
         """
-        if not torch.cuda.is_available():
-            self.args.device = 'cpu'
+        # if not torch.cuda.is_available():
+        #     self.args.device = 'cpu'
         self.args.device = torch.device(self.args.device)
 
         LOGGER.debug('Trainer (PID=%d), %s', os.getpid(),)
