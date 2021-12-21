@@ -44,8 +44,7 @@ def options(argv=None):
     parser.add_argument('--num-points', default=1024, type=int,
                         metavar='N',
                         help='points in point-cloud (default: 1024)')
-    parser.add_argument('--mag', default=0.8, type=float,
-                        metavar='T',
+    parser.add_argument('--mag', default=1.5, type=float, metavar='T',
                         help='max. mag. of twist-vectors (perturbations) on training (default: 0.8)')
 
     # settings for PointNet
