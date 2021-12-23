@@ -166,7 +166,9 @@ def train_ptlk(args, trainset, testset, action):
 
     LOGGER.debug('train, end')
 
-    action.infer_plot(model, testset)
+    action.plot_all_clouds(testset)
+
+    # action.infer_plot(model, testset)
 
 
 def save_checkpoint(state, outfile, suffix):
@@ -342,6 +344,28 @@ class Action:
 
         LOGGER.debug('eval, end')
 
+    def plot_all_clouds(self, testset):
+        """
+        infer on training & test sets to plot point cloud
+        """
+        self.args.device = torch.device(self.args.device)
+
+        # dataloader
+        testloader = torch.utils.data.DataLoader(
+            testset,
+            batch_size=1, shuffle=False, num_workers=self.args.workers)
+
+        for i, data in enumerate(testloader):
+            source_all, template_all, p11, igt = data
+            source_all = tuple(t.to(self.args.device) for t in source_all)
+            template_all = tuple(t.to(self.args.device) for t in template_all)
+            p11 = p11.to(self.args.device)  # source
+            igt = igt.to(self.args.device)
+            p0, unipolar0, bipolar0, af_type0, re_af_type0 = template_all
+            p1, unipolar1, bipolar1, af_type1, re_af_type1 = source_all
+            self.plot_one_pointcloud(p0, 'template')
+            self.plot_one_pointcloud(p1, i)
+
     def transform(self, g, a):
         """
         g : SE(3),  bs x 4 x 4
@@ -357,6 +381,26 @@ class Action:
 
         # b = g.matmul(a.unsqueeze(-1)).squeeze(-1)
         return b
+
+    def plot_one_pointcloud(self, p0, desc):
+        """
+        p0: point cloud
+        desc: description str
+        """
+        # p0_4 = torch.zeros(len(p0)).unsqueeze(1).to(p1)
+        # p0_cat = torch.cat((p0, p0_4), dim=-1)
+        # p1 = p1.detach().cpu().numpy()
+        # p0_rotated = torch.matmul(p0_cat, est_g)
+        p0 = p0.detach().cpu().numpy()
+
+        fig = plt.figure(figsize=(8, 8))
+        ax = fig.add_subplot(111, projection='3d')
+
+        # ax.scatter(p1[:, 0], p1[:, 1], p1[:, 2], c='b', label='source')
+        ax.scatter(p0[:, 0], p0[:, 1], p0[:, 2], c='r', label=f'{desc}')
+        # fig.xlabel(f'{desc}')
+        ax.legend()
+        plt.savefig(f'{desc}.jpg')
 
     def plot_pointcloud(self, p0, p1, desc):
         """
