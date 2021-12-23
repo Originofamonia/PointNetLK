@@ -363,8 +363,8 @@ class Action:
             igt = igt.to(self.args.device)
             p0, unipolar0, bipolar0, af_type0, re_af_type0 = template_all
             p1, unipolar1, bipolar1, af_type1, re_af_type1 = source_all
-            self.plot_one_pointcloud(p0, 'template')
-            self.plot_one_pointcloud(p1, i)
+            self.plot_one_pointcloud(p0[0], 'template')
+            self.plot_one_pointcloud(p1[0], i)
 
     def transform(self, g, a):
         """
