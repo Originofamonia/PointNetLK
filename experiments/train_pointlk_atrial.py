@@ -166,7 +166,7 @@ def train_ptlk(args, trainset, testset, action):
 
     LOGGER.debug('train, end')
     action.save_pointcloud(model, testset)
-    action.plot_all_clouds(testset)
+    # action.plot_all_clouds(testset)
 
     # action.infer_plot(model, testset)
 
