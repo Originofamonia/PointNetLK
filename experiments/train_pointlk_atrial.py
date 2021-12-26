@@ -72,10 +72,10 @@ def options(argv=None):
                         help='path to logfile (default: null (no logging))')
     parser.add_argument('-j', '--workers', default=4, type=int, metavar='N',
                         help='number of data loading workers (default: 4)')
-    parser.add_argument('-b', '--batch_size', default=1, type=int,
+    parser.add_argument('-b', '--batch_size', default=2, type=int,
                         metavar='N', help='mini-batch size (default: 32)')
     parser.add_argument('--epochs', default=10, type=int,
-                        metavar='N', help='number of total epochs to run')
+                        metavar='N', help='number of total epochs to finetune')
     parser.add_argument('--start_epoch', default=0, type=int, metavar='N',
                         help='manual epoch number (useful on restarts)')
     parser.add_argument('--optimizer', default='Adam', choices=['Adam', 'SGD'],
@@ -340,7 +340,7 @@ class Action:
 
             y0_list.append(af_type1[0].detach().cpu().numpy())
             y1_list.append(re_af_type1[0].detach().cpu().numpy())
-        np.savez('saved_pt.npz', x0=x_uni_list, x1=x_bi_list, y0=y0_list, y1=y1_list)
+        np.savez(f'saved_pt_{self.args.epochs}.npz', x0=x_uni_list, x1=x_bi_list, y0=y0_list, y1=y1_list)
 
     def infer_plot(self, model, testset):
         """
