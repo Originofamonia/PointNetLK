@@ -327,9 +327,9 @@ class Action:
 
             if i == 0:  # only append template once
                 x0 = torch.cat((p0[0], unipolar0[0]), dim=0)
-                x_uni_list.append(x0)
+                x_uni_list.append(x0.detach().cpu().numpy())
                 x1 = torch.cat((p0[0], bipolar0[0]), dim=0)
-                x_bi_list.append(x1)
+                x_bi_list.append(x1.detach().cpu().numpy())
                 y0_list.append(af_type0[0].detach().cpu().numpy())
                 y1_list.append(re_af_type0[0].detach().cpu().numpy())
 
