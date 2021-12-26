@@ -165,7 +165,7 @@ def train_ptlk(args, trainset, testset, action):
         # save_checkpoint(model.state_dict(), args.outfile, 'model_last')
 
     LOGGER.debug('train, end')
-
+    action.save_pointcloud(model, testset)
     action.plot_all_clouds(testset)
 
     # action.infer_plot(model, testset)
@@ -295,6 +295,39 @@ class Action:
             loss = loss_g
 
         return loss, loss_g
+
+    def save_pointcloud(self, model, testset):
+        """
+        save inferred point cloud with unipolar/bipolar
+        """
+        # dataloader
+        testloader = torch.utils.data.DataLoader(
+            testset,
+            batch_size=1, shuffle=False, num_workers=self.args.workers)
+        model.eval()
+        x_list = []
+        y_list = []
+        for i, data in enumerate(testloader):
+            source_all, template_all, p11, igt = data
+            source_all = tuple(t.to(self.args.device) for t in source_all)
+            template_all = tuple(t.to(self.args.device) for t in template_all)
+            p11 = p11.to(self.args.device)  # source
+            igt = igt.to(self.args.device)
+            p0, unipolar0, bipolar0, af_type0, re_af_type0 = template_all
+            p1, unipolar1, bipolar1, af_type1, re_af_type1 = source_all
+            r = ptlk.pointlk.PointLK.do_forward(model, p0, p1,
+                                                self.args.max_iter,
+                                                self.xtol,
+                                                self.p0_zero_mean,
+                                                self.p1_zero_mean)
+            g_est = model.g  # p1 -> p0, p0 = se3.transform(g_est, p1)
+            rotated_p1 = self.transform(g_est, p1[0])
+            if i == 0:  # only append template once
+                x_list.append(p0[0])
+                y_list.append(unipolar0[0])
+            x_list.append(rotated_p1[0])
+            y_list.append(unipolar1[0])
+
 
     def infer_plot(self, model, testset):
         """
