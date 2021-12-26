@@ -305,13 +305,15 @@ class Action:
             testset,
             batch_size=1, shuffle=False, num_workers=self.args.workers)
         model.eval()
-        x_list = []
-        y_list = []
+        x_uni_list = []
+        x_bi_list = []
+        y0_list = []
+        y1_list = []
         for i, data in enumerate(testloader):
             source_all, template_all, p11, igt = data
             source_all = tuple(t.to(self.args.device) for t in source_all)
             template_all = tuple(t.to(self.args.device) for t in template_all)
-            p11 = p11.to(self.args.device)  # source
+            p11 = p11.to(self.args.device)  # rigid transform from source
             igt = igt.to(self.args.device)
             p0, unipolar0, bipolar0, af_type0, re_af_type0 = template_all
             p1, unipolar1, bipolar1, af_type1, re_af_type1 = source_all
@@ -321,13 +323,24 @@ class Action:
                                                 self.p0_zero_mean,
                                                 self.p1_zero_mean)
             g_est = model.g  # p1 -> p0, p0 = se3.transform(g_est, p1)
-            rotated_p1 = self.transform(g_est, p1[0])
-            if i == 0:  # only append template once
-                x_list.append(p0[0])
-                y_list.append(unipolar0[0])
-            x_list.append(rotated_p1[0])
-            y_list.append(unipolar1[0])
+            rotated_p1 = self.transform(g_est, p1[0])  # [306, 3]
 
+            if i == 0:  # only append template once
+                x0 = torch.cat((p0[0], unipolar0[0]), dim=0)
+                x_uni_list.append(x0)
+                x1 = torch.cat((p0[0], bipolar0[0]), dim=0)
+                x_bi_list.append(x1)
+                y0_list.append(af_type0[0].detach().cpu().numpy())
+                y1_list.append(re_af_type0[0].detach().cpu().numpy())
+
+            x0 = torch.cat((rotated_p1, unipolar1[0]), dim=0)  # append source
+            x_uni_list.append(x0.detach().cpu().numpy())
+            x1 = torch.cat((rotated_p1, bipolar1[0]), dim=0)
+            x_bi_list.append(x1.detach().cpu().numpy())
+
+            y0_list.append(af_type1[0].detach().cpu().numpy())
+            y1_list.append(re_af_type1[0].detach().cpu().numpy())
+        np.savez('saved_pt.npz', x0=x_uni_list, x1=x_bi_list, y0=y0_list, y1=y1_list)
 
     def infer_plot(self, model, testset):
         """
