@@ -326,16 +326,16 @@ class Action:
             rotated_p1 = self.transform(g_est, p1[0])  # [306, 3]
 
             if i == 0:  # only append template once
-                x0 = torch.cat((p0[0], unipolar0[0].unsqueeze(-1)), dim=0)
+                x0 = torch.cat((p0[0], unipolar0[0].unsqueeze(-1)), dim=-1)
                 x_uni_list.append(x0.detach().cpu().numpy())
-                x1 = torch.cat((p0[0], bipolar0[0].unsqueeze(-1)), dim=0)
+                x1 = torch.cat((p0[0], bipolar0[0].unsqueeze(-1)), dim=-1)
                 x_bi_list.append(x1.detach().cpu().numpy())
                 y0_list.append(af_type0[0].detach().cpu().numpy())
                 y1_list.append(re_af_type0[0].detach().cpu().numpy())
 
-            x0 = torch.cat((rotated_p1, unipolar1[0].unsqueeze(-1)), dim=0)  # append source
+            x0 = torch.cat((rotated_p1, unipolar1[0].unsqueeze(-1)), dim=-1)  # append source
             x_uni_list.append(x0.detach().cpu().numpy())
-            x1 = torch.cat((rotated_p1, bipolar1[0].unsqueeze(-1)), dim=0)
+            x1 = torch.cat((rotated_p1, bipolar1[0].unsqueeze(-1)), dim=-1)
             x_bi_list.append(x1.detach().cpu().numpy())
 
             y0_list.append(af_type1[0].detach().cpu().numpy())
