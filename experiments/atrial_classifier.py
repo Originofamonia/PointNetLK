@@ -20,7 +20,7 @@ def main():
     x0 = np.reshape(x0, (x0.shape[0], -1, 4))[:, :, -1]  # [8， -1]
     x1 = np.reshape(x1, (x1.shape[0], -1, 4))[:, :, -1]  # [8， -1]
     y0 = y0 - 1  # values of 1, 2 -> 0, 1
-    kfold = KFold(n_splits=8, shuffle=True)
+    kfold = KFold(n_splits=8, shuffle=True)  # leave one out cross validation
 
     preds = []
     labels = []

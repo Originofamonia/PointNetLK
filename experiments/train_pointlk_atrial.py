@@ -165,9 +165,10 @@ def train_ptlk(args, trainset, testset, action):
         # save_checkpoint(model.state_dict(), args.outfile, 'model_last')
 
     LOGGER.debug('train, end')
-    action.save_pointcloud(model, testset)
     # action.plot_all_clouds(testset)
-    action.infer_plot(model, testset)
+    action.plot_polars(testset)
+    # action.save_pointcloud(model, testset)
+    # action.infer_plot(model, testset)
 
 
 def save_checkpoint(state, outfile, suffix):
@@ -410,6 +411,28 @@ class Action:
             p1, unipolar1, bipolar1, af_type1, re_af_type1 = source_all
             self.plot_one_pointcloud(p0[0], 'template')
             self.plot_one_pointcloud(p1[0], i)
+
+    def plot_polars(self, testset):
+        """
+        plot uni/bi-polar values
+        """
+        self.args.device = torch.device(self.args.device)
+
+        # dataloader
+        testloader = torch.utils.data.DataLoader(
+            testset,
+            batch_size=1, shuffle=False, num_workers=self.args.workers)
+
+        for i, data in enumerate(testloader):
+            source_all, template_all, p11, igt = data
+            source_all = tuple(t.to(self.args.device) for t in source_all)
+            template_all = tuple(t.to(self.args.device) for t in template_all)
+            p11 = p11.to(self.args.device)  # source
+            igt = igt.to(self.args.device)
+            p0, unipolar0, bipolar0, af_type0, re_af_type0 = template_all
+            p1, unipolar1, bipolar1, af_type1, re_af_type1 = source_all
+            if i == 0:
+                print(unipolar0[0].detach().cpu().numpy())
 
     def transform(self, g, a):
         """
