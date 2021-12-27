@@ -19,16 +19,16 @@ def main():
     x0, x1, y0, y1 = npzfile['x0'], npzfile['x1'], npzfile['y0'], npzfile['y1']
     x0 = np.reshape(x0, (x0.shape[0], -1))  # [8， -1]
     x1 = np.reshape(x1, (x1.shape[0], -1))  # [8， -1]
-    y0 = y0 - 1  # values of 1, 2 -> 0, 1
+    # y0 = y0 - 1  # values of 1, 2 -> 0, 1
     kfold = KFold(n_splits=8, shuffle=True)
 
     preds = []
     labels = []
-    for fold, (train_ids, test_ids) in enumerate(kfold.split(X=x0, y=y1)):
+    for fold, (train_ids, test_ids) in enumerate(kfold.split(X=x0, y=y0)):
         x_train = x0[train_ids]
-        y_train = y1[train_ids]
+        y_train = y0[train_ids]
         x_test = x0[test_ids]
-        y_test = y1[test_ids]
+        y_test = y0[test_ids]
         clf = make_pipeline(StandardScaler(), SVC(gamma='auto'))
         clf.fit(x_train, y_train)
         preds.append(clf.predict(x_test)[0])
