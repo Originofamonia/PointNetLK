@@ -27,8 +27,8 @@ def main():
     for fold, (train_ids, test_ids) in enumerate(kfold.split(X=x1, y=y0)):
         x = x1
         y = y0
-        # svm_classifier(labels, preds, x, y, train_ids, test_ids)
-        lr_classifier(labels, preds, x, y, train_ids, test_ids)
+        svm_classifier(labels, preds, x, y, train_ids, test_ids)
+        # lr_classifier(labels, preds, x, y, train_ids, test_ids)
 
     acc = accuracy_score(labels, preds)
     print(f'preds: {preds}; labels: {labels}')
