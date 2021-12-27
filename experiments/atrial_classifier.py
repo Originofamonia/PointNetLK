@@ -19,9 +19,11 @@ def main():
     x1 = np.reshape(x1, (x1.shape[0], -1))  # [8， -1]
     kfold = KFold(n_splits=8, shuffle=True)
     for fold, (train_ids, test_ids) in enumerate(kfold.split(X=x0, y=y0)):
-        # add classification here
-        print(train_ids, test_ids)
-
+        x_train = x0[train_ids]
+        y_train = y0[train_ids]
+        x_test = x0[test_ids]
+        y_test = y0[test_ids]
+        print(y_test)
 
 if __name__ == '__main__':
     main()
