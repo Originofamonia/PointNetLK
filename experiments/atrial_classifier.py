@@ -17,6 +17,7 @@ def main():
     x0, x1, y0, y1 = npzfile['x0'], npzfile['x1'], npzfile['y0'], npzfile['y1']
     x0 = np.reshape(x0, (x0.shape[0], -1))  # [8， -1]
     x1 = np.reshape(x1, (x1.shape[0], -1))  # [8， -1]
+    y0 = y0 - 1  # values of 1, 2 -> 0, 1
     kfold = KFold(n_splits=8, shuffle=True)
     for fold, (train_ids, test_ids) in enumerate(kfold.split(X=x0, y=y0)):
         x_train = x0[train_ids]
