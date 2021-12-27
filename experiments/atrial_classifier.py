@@ -25,18 +25,38 @@ def main():
     preds = []
     labels = []
     for fold, (train_ids, test_ids) in enumerate(kfold.split(X=x0, y=y0)):
-        x_train = x0[train_ids]
-        y_train = y0[train_ids]
-        x_test = x0[test_ids]
-        y_test = y0[test_ids]
-        clf = make_pipeline(StandardScaler(), SVC(gamma='auto'))
-        clf.fit(x_train, y_train)
-        preds.append(clf.predict(x_test)[0])
-        labels.append(y_test[0])
+        x = x0
+        y = y0
+        # svm_classifier(labels, preds, x, y, train_ids, test_ids)
+        lr_classifier(labels, preds, x, y, train_ids, test_ids)
 
     acc = accuracy_score(labels, preds)
     print(f'preds: {preds}; labels: {labels}')
     print(f'acc: {acc}')
+
+
+def svm_classifier(labels, preds, x, y, train_ids, test_ids):
+    x_train = x[train_ids]
+    y_train = y[train_ids]
+    x_test = x[test_ids]
+    y_test = y[test_ids]
+    clf = make_pipeline(StandardScaler(), SVC(gamma='auto'))
+    clf.fit(x_train, y_train)
+    preds.append(clf.predict(x_test)[0])
+    labels.append(y_test[0])
+
+
+def lr_classifier(labels, preds, x0, y0, train_ids, test_ids):
+    """
+    logistic regression classifier
+    """
+    x_train = x0[train_ids]
+    y_train = y0[train_ids]
+    x_test = x0[test_ids]
+    y_test = y0[test_ids]
+    clf = LogisticRegression(random_state=0).fit(x_train, y_train)
+    preds.append(clf.predict(x_test)[0])
+    labels.append(y_test[0])
 
 
 if __name__ == '__main__':
