@@ -7,7 +7,7 @@ from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import StandardScaler
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import KFold, GridSearchCV
-from sklearn.metrics import precision_score, recall_score, f1_score
+from sklearn.metrics import precision_score, recall_score, f1_score, accuracy_score
 import numpy as np
 
 
@@ -34,7 +34,9 @@ def main():
         preds.append(clf.predict(x_test)[0])
         labels.append(y_test[0])
 
-    print(preds, labels)
+    acc = accuracy_score(labels, preds)
+    print(f'acc: {acc}')
+
 
 if __name__ == '__main__':
     main()
