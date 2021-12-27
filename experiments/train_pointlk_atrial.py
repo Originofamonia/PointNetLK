@@ -72,7 +72,7 @@ def options(argv=None):
                         help='path to logfile (default: null (no logging))')
     parser.add_argument('-j', '--workers', default=4, type=int, metavar='N',
                         help='number of data loading workers (default: 4)')
-    parser.add_argument('-b', '--batch_size', default=2, type=int,
+    parser.add_argument('-b', '--batch_size', default=1, type=int,
                         metavar='N', help='mini-batch size (default: 32)')
     parser.add_argument('--epochs', default=10, type=int,
                         metavar='N', help='number of total epochs to finetune')
