@@ -31,8 +31,8 @@ def main():
         y_test = y0[test_ids]
         clf = make_pipeline(StandardScaler(), SVC(gamma='auto'))
         clf.fit(x_train, y_train)
-        preds.append(clf.predict(x_test))
-        labels.append(y_test)
+        preds.append(clf.predict(x_test)[0])
+        labels.append(y_test[0])
 
     print(preds, labels)
 
