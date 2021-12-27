@@ -3,6 +3,8 @@ train a simple classifier on registered point cloud with uni/bi-polar
 """
 
 from sklearn.svm import SVC
+from sklearn.pipeline import make_pipeline
+from sklearn.preprocessing import StandardScaler
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import KFold, GridSearchCV
 from sklearn.metrics import precision_score, recall_score, f1_score
@@ -19,12 +21,20 @@ def main():
     x1 = np.reshape(x1, (x1.shape[0], -1))  # [8， -1]
     y0 = y0 - 1  # values of 1, 2 -> 0, 1
     kfold = KFold(n_splits=8, shuffle=True)
+
+    preds = []
+    labels = []
     for fold, (train_ids, test_ids) in enumerate(kfold.split(X=x0, y=y0)):
         x_train = x0[train_ids]
         y_train = y0[train_ids]
         x_test = x0[test_ids]
         y_test = y0[test_ids]
-        print(y_test)
+        clf = make_pipeline(StandardScaler(), SVC(gamma='auto'))
+        clf.fit(x_train, y_train)
+        preds.append(clf.predict(x_test))
+        labels.append(y_test)
+
+    print(preds, labels)
 
 if __name__ == '__main__':
     main()
