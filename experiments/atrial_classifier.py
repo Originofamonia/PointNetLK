@@ -35,6 +35,7 @@ def main():
         labels.append(y_test[0])
 
     acc = accuracy_score(labels, preds)
+    print(f'preds: {preds}; labels: {labels}')
     print(f'acc: {acc}')
 
 
