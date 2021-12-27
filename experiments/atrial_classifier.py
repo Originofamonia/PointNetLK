@@ -54,7 +54,7 @@ def lr_classifier(labels, preds, x0, y0, train_ids, test_ids):
     y_train = y0[train_ids]
     x_test = x0[test_ids]
     y_test = y0[test_ids]
-    clf = LogisticRegression(random_state=0).fit(x_train, y_train)
+    clf = LogisticRegression(random_state=444).fit(x_train, y_train)
     preds.append(clf.predict(x_test)[0])
     labels.append(y_test[0])
 
