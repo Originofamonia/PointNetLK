@@ -431,8 +431,27 @@ class Action:
             igt = igt.to(self.args.device)
             p0, unipolar0, bipolar0, af_type0, re_af_type0 = template_all
             p1, unipolar1, bipolar1, af_type1, re_af_type1 = source_all
-            if i == 0:
-                print(unipolar0[0].detach().cpu().numpy())
+
+            if i == 0:  # only plot template polar once
+                fig = plt.figure(figsize=(8, 8))
+                ax = fig.add_subplot(111)
+                plt.plot(unipolar0[0].detach().cpu().numpy(), label=f'template_uni')
+                plt.plot(bipolar0[0].detach().cpu().numpy(),
+                         label=f'template_bi')
+                ax.legend()
+                plt.savefig(f'polar_template.jpg')
+                plt.close(fig)
+
+            fig = plt.figure(figsize=(8, 8))  # plot other polars
+            ax = fig.add_subplot(111)
+            plt.plot(unipolar1[0].detach().cpu().numpy(), c='y',
+                     label=f'uni_{i}')
+            plt.plot(bipolar1[0].detach().cpu().numpy(), c='m',
+                     label=f'bi_{i}')
+            ax.legend()
+            plt.savefig(f'polar_{i}.jpg')
+            plt.close(fig)
+
 
     def transform(self, g, a):
         """
