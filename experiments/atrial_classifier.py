@@ -24,11 +24,11 @@ def main():
 
     preds = []
     labels = []
-    for fold, (train_ids, test_ids) in enumerate(kfold.split(X=x1, y=y0)):
+    for fold, (train_ids, test_ids) in enumerate(kfold.split(X=x1, y=y1)):
         x_train = x1[train_ids]
-        y_train = y0[train_ids]
+        y_train = y1[train_ids]
         x_test = x1[test_ids]
-        y_test = y0[test_ids]
+        y_test = y1[test_ids]
         clf = make_pipeline(StandardScaler(), SVC(gamma='auto'))
         clf.fit(x_train, y_train)
         preds.append(clf.predict(x_test)[0])
