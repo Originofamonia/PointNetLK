@@ -166,8 +166,8 @@ def train_ptlk(args, trainset, testset, action):
 
     LOGGER.debug('train, end')
     # action.plot_all_clouds(testset)
-    action.plot_polars(testset)
-    # action.save_pointcloud(model, testset)
+    # action.plot_polars(testset)
+    action.save_pointcloud(model, testset)
     # action.infer_plot(model, testset)
 
 
@@ -392,7 +392,7 @@ class Action:
 
     def plot_all_clouds(self, testset):
         """
-        infer on training & test sets to plot point cloud
+        plot all point clouds
         """
         self.args.device = torch.device(self.args.device)
 
@@ -434,21 +434,22 @@ class Action:
 
             if i == 0:  # only plot template polar once
                 fig = plt.figure(figsize=(8, 8))
-                ax = fig.add_subplot(111)
-                plt.plot(unipolar0[0].detach().cpu().numpy(), label=f'template_uni')
-                plt.plot(bipolar0[0].detach().cpu().numpy(),
+                ax1 = fig.add_subplot(111)
+                plt.plot(unipolar0[0].detach().cpu().numpy(), c='y',
+                         label=f'template_uni_{af_type0[0]}_{re_af_type0[0]}')
+                plt.plot(bipolar0[0].detach().cpu().numpy(), c='m',
                          label=f'template_bi')
-                ax.legend()
+                ax1.legend()
                 plt.savefig(f'polar_template.jpg')
                 plt.close(fig)
 
             fig = plt.figure(figsize=(8, 8))  # plot other polars
-            ax = fig.add_subplot(111)
+            ax1 = fig.add_subplot(111)
             plt.plot(unipolar1[0].detach().cpu().numpy(), c='y',
                      label=f'uni_{i}')
             plt.plot(bipolar1[0].detach().cpu().numpy(), c='m',
                      label=f'bi_{i}')
-            ax.legend()
+            ax1.legend()
             plt.savefig(f'polar_{i}.jpg')
             plt.close(fig)
 
