@@ -340,7 +340,7 @@ class Action:
 
             y0_list.append(af_type1[0].detach().cpu().numpy())
             y1_list.append(re_af_type1[0].detach().cpu().numpy())
-        np.savez(f'saved_pt_{self.args.epochs}.npz', x0=x_uni_list, x1=x_bi_list, y0=y0_list, y1=y1_list)
+        np.savez(f'saved_pt_{self.args.epochs}.npz', x0=x_uni_list, x1=x_bi_list, y0=y0_list, y1=y1_list, dtype=object)
 
     def infer_plot(self, model, testset):
         """
