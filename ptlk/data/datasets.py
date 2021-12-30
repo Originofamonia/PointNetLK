@@ -35,6 +35,9 @@ class Voltages(Dataset):
     def __getitem__(self, idx):
         return self.x[idx], self.y[idx]
 
+    def __len__(self):
+        return len(self.y)
+
 
 class Atrial(Dataset):
     """ atrial dataset """
