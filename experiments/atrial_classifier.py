@@ -17,10 +17,11 @@ def reorder_by_distance(x):
     reordered voltages
     """
     coords = x[:, :, 0: 3]  # [B, N, 3]
+    voltages = x[:, :, -1]
     abs_coords = np.abs(coords)
     l1_d = np.sum(abs_coords, axis=-1)  # [B, N]
-    sorted_indices = np.argsort(l1_d, axis=-1)
-    sorted_voltages = x[:, :, -1][sorted_indices]
+    sorted_indices = np.argsort(l1_d, axis=-1)  # [B, N]
+    sorted_voltages = [sorted_indices]
     return sorted_voltages
 
 
