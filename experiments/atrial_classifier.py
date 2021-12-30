@@ -10,6 +10,7 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import KFold, GridSearchCV
 from sklearn.metrics import precision_score, recall_score, f1_score, \
     accuracy_score
+from tqdm import tqdm
 import numpy as np
 import torch
 import torch.nn as nn
@@ -83,7 +84,8 @@ def train_mlp(labels, preds, x, y, train_ids, test_ids):
     optimizer = torch.optim.Adam(model.parameters(), lr=1e-3)
 
     for e in range(epochs):
-        for i, data in enumerate(train_loader):
+        pbar = tqdm(train_loader)
+        for i, data in enumerate(pbar):
             data = tuple(item.to(device) for item in data)
             x, y = data
             x = x.unsqueeze(-1)
@@ -92,6 +94,7 @@ def train_mlp(labels, preds, x, y, train_ids, test_ids):
             loss = criterion(outputs, y)
             loss.backward()
             optimizer.step()
+            pbar.set_description(f'loss: {loss.item()}')
 
     model.eval()
     for i, data in enumerate(test_loader):
