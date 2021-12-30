@@ -24,7 +24,7 @@ def reorder_by_distance(x):
     sorted_voltages = []
     for i, row in enumerate(sorted_indices):
         sorted_voltages.append(voltages[i][row])
-    return sorted_voltages
+    return np.asarray(sorted_voltages)
 
 
 def main():
