@@ -191,8 +191,8 @@ def plot_data_y0():
         ax0 = fig.add_subplot(211)
         ax1 = fig.add_subplot(212)
 
-        ax0.scatter(voltage0[i], c='b', label=f'x0, y0: {y0[i]}; y1: {y1[i]}')
-        ax1.scatter(voltage1[i], c='r', label=f'x1, y0: {y0[i]}; y1: {y1[i]}')
+        ax0.plot(voltage0[i], c='b', label=f'x0, y0: {y0[i]}; y1: {y1[i]}')
+        ax1.plot(voltage1[i], c='r', label=f'x1, y0: {y0[i]}; y1: {y1[i]}')
         # fig.xlabel(f'{desc}')
         ax0.legend()
         plt.savefig(f'voltage_{i}.jpg')
