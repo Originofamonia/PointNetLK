@@ -57,7 +57,7 @@ class RNN(nn.Module):
         # input size : (batch, seq_len, input_size)
         out, h_n = self.rnn(x)
         out = F.relu(torch.max(out, dim=1)[0])
-        out = F.softmax(self.fc(out))
+        out = F.softmax(self.fc(out), dim=-1)
         return out
 
 
@@ -97,6 +97,7 @@ def train_mlp(labels, preds, x, y, train_ids, test_ids):
     for i, data in enumerate(test_loader):
         data = tuple(item.to(device) for item in data)
         x, y = data
+        x = x.unsqueeze(-1)
         outputs = model(x)
         pred_cls = outputs.data.max(1)[1].item()
         preds.append(pred_cls)
