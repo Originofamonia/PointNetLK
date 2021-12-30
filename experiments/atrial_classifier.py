@@ -8,10 +8,12 @@ from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import StandardScaler
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import KFold, GridSearchCV
-from sklearn.metrics import precision_score, recall_score, f1_score, accuracy_score
+from sklearn.metrics import precision_score, recall_score, f1_score, \
+    accuracy_score
 import numpy as np
 import torch
 import torch.nn as nn
+import torch.nn.functional as F
 
 sys.path.insert(0, os.path.abspath(
     os.path.join(os.path.dirname(__file__), os.pardir)))
@@ -43,6 +45,22 @@ class MLP(nn.Module):
         return self.layer(x)
 
 
+class RNN(nn.Module):
+    def __init__(self, input_dim=306, dropout=0.3):
+        super(RNN, self).__init__()
+        # self.args = args
+        self.rnn = nn.LSTM(input_size=input_dim, hidden_size=300,
+                           num_layers=2, batch_first=True)
+        self.fc = nn.Linear(300, 2)
+
+    def forward(self, x):
+        # input size : (batch, seq_len, input_size)
+        out, h_n = self.rnn(x)
+        out = F.relu(torch.max(out, dim=-1)[0])
+        out = F.softmax(self.fc(out))
+        return out
+
+
 def train_mlp(labels, preds, x, y, train_ids, test_ids):
     epochs = 30
     device = 'cuda'
@@ -59,26 +77,26 @@ def train_mlp(labels, preds, x, y, train_ids, test_ids):
         test_data,
         batch_size=1, shuffle=False, num_workers=2)
 
-    mlp = MLP().to(device)
-    mlp.train()
+    model = RNN().to(device)
+    model.train()
     criterion = nn.CrossEntropyLoss()
-    optimizer = torch.optim.Adam(mlp.parameters(), lr=1e-3)
+    optimizer = torch.optim.Adam(model.parameters(), lr=1e-3)
 
     for e in range(epochs):
         for i, data in enumerate(train_loader):
             data = tuple(item.to(device) for item in data)
             x, y = data
             optimizer.zero_grad()
-            outputs = mlp(x)
+            outputs = model(x)
             loss = criterion(outputs, y)
             loss.backward()
             optimizer.step()
 
-    mlp.eval()
+    model.eval()
     for i, data in enumerate(test_loader):
         data = tuple(item.to(device) for item in data)
         x, y = data
-        outputs = mlp(x)
+        outputs = model(x)
         pred_cls = outputs.data.max(1)[1].item()
         preds.append(pred_cls)
         labels.append(y[0].item())
