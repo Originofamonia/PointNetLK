@@ -49,7 +49,7 @@ class RNN(nn.Module):
     def __init__(self, input_dim=306, dropout=0.3):
         super(RNN, self).__init__()
         # self.args = args
-        self.rnn = nn.LSTM(input_size=input_dim, hidden_size=300,
+        self.rnn = nn.LSTM(input_size=1, hidden_size=300,
                            num_layers=2, batch_first=True)
         self.fc = nn.Linear(300, 2)
 
@@ -86,6 +86,7 @@ def train_mlp(labels, preds, x, y, train_ids, test_ids):
         for i, data in enumerate(train_loader):
             data = tuple(item.to(device) for item in data)
             x, y = data
+            x = x.unsqueeze(-1)
             optimizer.zero_grad()
             outputs = model(x)
             loss = criterion(outputs, y)
