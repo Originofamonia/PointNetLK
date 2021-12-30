@@ -18,6 +18,8 @@ sys.path.insert(0, os.path.abspath(
 
 import ptlk
 
+os.environ['CUDA_VISIBLE_DIVICES'] = '1'
+
 
 class MLP(nn.Module):
     """Discriminator model for source domain."""
