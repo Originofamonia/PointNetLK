@@ -11,6 +11,19 @@ from sklearn.metrics import precision_score, recall_score, f1_score, accuracy_sc
 import numpy as np
 
 
+def reorder_by_distance(x):
+    """
+    reorder points by their coordinates L1 distance to original point and return
+    reordered voltages
+    """
+    coords = x[:, :, 0: 3]  # [B, N, 3]
+    abs_coords = np.abs(coords)
+    l1_d = np.sum(abs_coords, axis=-1)  # [B, N]
+    sorted_indices = np.argsort(l1_d, axis=-1)
+    sorted_voltages = x[:, :, -1][sorted_indices]
+    return sorted_voltages
+
+
 def main():
     """
     implement leave one out cross validation
@@ -20,6 +33,9 @@ def main():
     x0 = np.reshape(x0, (x0.shape[0], -1, 4))  # [:, :, -1]  # [8， -1]
     x1 = np.reshape(x1, (x1.shape[0], -1, 4))  # [:, :, -1]  # [8， -1]
     y0 = y0 - 1  # values of 1, 2 -> 0, 1
+    # add reorder by L1 distance before classifier
+    x0 = reorder_by_distance(x0)
+    x1 = reorder_by_distance(x1)
     kfold = KFold(n_splits=8, shuffle=True)  # leave one out cross validation
 
     preds = []
