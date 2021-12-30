@@ -27,6 +27,15 @@ class ModelNet(globset.Globset):
         super().__init__(dataset_path, pattern, loader, transform, classinfo)
 
 
+class Voltages(Dataset):
+    def __init__(self, x, y):
+        self.x = torch.from_numpy(x)
+        self.y = torch.from_numpy(y)
+
+    def __getitem__(self, idx):
+        return self.x[idx], self.y[idx]
+
+
 class Atrial(Dataset):
     """ atrial dataset """
 
