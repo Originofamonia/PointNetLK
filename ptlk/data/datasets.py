@@ -30,7 +30,7 @@ class ModelNet(globset.Globset):
 class Voltages(Dataset):
     def __init__(self, x, y):
         self.x = torch.from_numpy(x).float()
-        self.y = torch.from_numpy(y)
+        self.y = torch.from_numpy(y).long()
 
     def __getitem__(self, idx):
         return self.x[idx], self.y[idx]
