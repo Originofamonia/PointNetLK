@@ -50,8 +50,8 @@ class RNN(nn.Module):
     def __init__(self, input_dim=306, dropout=0.3):
         super(RNN, self).__init__()
         # self.args = args
-        self.rnn = nn.LSTM(input_size=1, hidden_size=300,
-                           num_layers=2, batch_first=True)
+        self.rnn = nn.RNN(input_size=1, hidden_size=300,
+                          num_layers=2, batch_first=True)
         self.fc = nn.Linear(300, 2)
 
     def forward(self, x):
@@ -139,9 +139,9 @@ def main():
 
     preds = []
     labels = []
-    for fold, (train_ids, test_ids) in enumerate(kfold.split(X=x1, y=y1)):
+    for fold, (train_ids, test_ids) in enumerate(kfold.split(X=x1, y=y0)):
         x = x1
-        y = y1
+        y = y0
         # svm_classifier(labels, preds, x, y, train_ids, test_ids)
         # lr_classifier(labels, preds, x, y, train_ids, test_ids)
         train_mlp(labels, preds, x, y, train_ids, test_ids)
