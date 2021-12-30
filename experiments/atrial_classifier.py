@@ -32,7 +32,7 @@ class MLP(nn.Module):
             # nn.Linear(param.hidden_dim, param.hidden_dim),
             # nn.Dropout(p=dropout),
             # nn.LeakyReLU(),
-            nn.Linear(300, 1),
+            nn.Linear(300, 2),
             nn.Sigmoid()
         )
 
