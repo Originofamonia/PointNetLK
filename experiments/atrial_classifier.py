@@ -56,7 +56,7 @@ class RNN(nn.Module):
     def forward(self, x):
         # input size : (batch, seq_len, input_size)
         out, h_n = self.rnn(x)
-        out = F.relu(torch.max(out, dim=-1)[0])
+        out = F.relu(torch.max(out, dim=1)[0])
         out = F.softmax(self.fc(out))
         return out
 
