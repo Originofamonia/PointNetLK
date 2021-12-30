@@ -15,6 +15,7 @@ import numpy as np
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+import matplotlib.pyplot as plt
 
 sys.path.insert(0, os.path.abspath(
     os.path.join(os.path.dirname(__file__), os.pardir)))
@@ -175,5 +176,29 @@ def lr_classifier(labels, preds, x0, y0, train_ids, test_ids):
     labels.append(y_test[0])
 
 
+def plot_data_y0():
+    """
+    plot data & labels
+    """
+    npzfile = np.load(f'saved_pt_10.npz', allow_pickle=True)
+    x0, x1, y0, y1 = npzfile['x0'], npzfile['x1'], npzfile['y0'], npzfile['y1']
+    x0 = np.reshape(x0, (x0.shape[0], -1, 4))  # [:, :, -1]  # [8， -1]
+    x1 = np.reshape(x1, (x1.shape[0], -1, 4))  # [:, :, -1]  # [8， -1]
+    voltage0 = x0[:, :, -1]
+    voltage1 = x1[:, :, -1]
+    for i in range(len(voltage0)):
+        fig = plt.figure(figsize=(8, 8))
+        ax0 = fig.add_subplot(211)
+        ax1 = fig.add_subplot(212)
+
+        ax0.scatter(voltage0[i], c='b', label=f'x0, y0: {y0[i]}; y1: {y1[i]}')
+        ax1.scatter(voltage1[i], c='r', label=f'x1, y0: {y0[i]}; y1: {y1[i]}')
+        # fig.xlabel(f'{desc}')
+        ax0.legend()
+        plt.savefig(f'voltage_{i}.jpg')
+        plt.close(fig)
+
+
 if __name__ == '__main__':
-    main()
+    # main()
+    plot_data_y0()
