@@ -148,8 +148,11 @@ def main():
         train_mlp(labels, preds, x, y, train_ids, test_ids)
 
     acc = accuracy_score(labels, preds)
+    precision = precision_score(labels, preds)
+    recall = recall_score(labels, preds)
+    f1 = f1_score(labels, preds)
     print(f'preds: {preds}; labels: {labels}')
-    print(f'acc: {acc}')
+    print(f'acc: {acc}, precision: {precision}, recall: {recall}, f1: {f1}')
 
 
 def svm_classifier(labels, preds, x, y, train_ids, test_ids):

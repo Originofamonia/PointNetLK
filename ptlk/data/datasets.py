@@ -52,6 +52,7 @@ class Atrial(Dataset):
         self.filtered_df = labels_df[labels_df['Study number'].isin(self.dirs)]  # total 8 samples
         # self.get_n_points()  # only need once
         # self.template_id = 0  # select 0 as the template for inference
+        test_indices = [0, 2, 3, 4, 5, 6, 7]
         if training:
             self.study_ids = self.filtered_df['Study number'].values[:]
             self.af_labels = self.filtered_df['AF type'].values[:]
