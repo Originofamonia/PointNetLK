@@ -51,16 +51,15 @@ class Atrial(Dataset):
         labels_df = pd.read_csv(f'{dataset_path}/label.csv')
         self.filtered_df = labels_df[labels_df['Study number'].isin(self.dirs)]  # total 8 samples
         # self.get_n_points()  # only need once
-        # self.template_id = 0  # select 0 as the template for inference
-        test_indices = [0, 2, 3, 4, 5, 6, 7]
+        self.template_id = 1  # select i as the template for inference
         if training:
             self.study_ids = self.filtered_df['Study number'].values[:]
             self.af_labels = self.filtered_df['AF type'].values[:]
             self.re_af_labels = self.filtered_df['1Y re AF'].values[:]
         else:
-            self.study_ids = self.filtered_df['Study number'].values
-            self.af_labels = self.filtered_df['AF type'].values[1:]
-            self.re_af_labels = self.filtered_df['1Y re AF'].values[1:]
+            self.study_ids = np.delete(self.filtered_df['Study number'].values, self.template_id)
+            self.af_labels = np.delete(self.filtered_df['AF type'].values, self.template_id)
+            self.re_af_labels = np.delete(self.filtered_df['1Y re AF'].values, self.template_id)
 
     def __getitem__(self, idx):
         study_id = self.study_ids[idx]
@@ -85,7 +84,7 @@ class Atrial(Dataset):
         print(n_points)  # [765, 406, 1374, 594, 4471, 2683, 1593, 2494]
 
     def get_template(self):
-        study_id = self.filtered_df['Study number'].values[0]
+        study_id = self.filtered_df['Study number'].values[self.template_id]
         path = f'{self.dataset_path}/Cleaned_PatientData/{study_id}/{study_id}_eam_data.csv'
         df = pd.read_csv(path)
         df = df.sample(n=406, replace=False, random_state=np.random.randint(444))
