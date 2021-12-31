@@ -9,7 +9,7 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import KFold, GridSearchCV
 from sklearn.metrics import precision_score, recall_score, f1_score, \
-    accuracy_score
+    accuracy_score, roc_auc_score
 from tqdm import tqdm
 import numpy as np
 import torch
@@ -132,7 +132,8 @@ def main():
     x0, x1, y0, y1 = npzfile['x0'], npzfile['x1'], npzfile['y0'], npzfile['y1']
     x0 = np.reshape(x0, (x0.shape[0], -1, 4))  # [:, :, -1]  # [8， -1]
     x1 = np.reshape(x1, (x1.shape[0], -1, 4))  # [:, :, -1]  # [8， -1]
-    y0 = y0 - 1  # values of 1, 2 -> 0, 1, AF type
+    y0 = 2 - y0  # values of 1, 2 -> 1, 0, AF type
+    y1 = 1 - y1  # 1Y re AF
     # add reorder by L1 distance before classifier
     x0 = reorder_by_distance(x0)  # unipolar
     x1 = reorder_by_distance(x1)  # bipolar
