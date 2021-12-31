@@ -64,7 +64,7 @@ class RNN(nn.Module):
 
 
 def train_mlp(labels, preds, x, y, train_ids, test_ids):
-    epochs = 50
+    epochs = 30
     device = 'cuda'
     x_train = x[train_ids]
     y_train = y[train_ids]
