@@ -51,7 +51,7 @@ class RNN(nn.Module):
     def __init__(self, input_dim=306, dropout=0.3):
         super(RNN, self).__init__()
         # self.args = args
-        self.rnn = nn.RNN(input_size=1, hidden_size=300,
+        self.rnn = nn.GRU(input_size=1, hidden_size=300,
                           num_layers=2, batch_first=True)
         self.fc = nn.Linear(300, 2)
 
@@ -79,7 +79,7 @@ def train_mlp(labels, preds, x, y, train_ids, test_ids):
         test_data,
         batch_size=1, shuffle=False, num_workers=2)
 
-    model = MLP().to(device)
+    model = RNN().to(device)
     model.train()
     criterion = nn.CrossEntropyLoss()
     optimizer = torch.optim.Adam(model.parameters(), lr=1e-3)
