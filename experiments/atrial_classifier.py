@@ -74,7 +74,7 @@ def train_mlp(labels, preds, x, y, train_ids, test_ids):
     test_data = ptlk.data.datasets.Voltages(x=x_test, y=y_test)
     train_loader = torch.utils.data.DataLoader(
         train_data,
-        batch_size=2, shuffle=True, num_workers=2)
+        batch_size=1, shuffle=True, num_workers=2)
     test_loader = torch.utils.data.DataLoader(
         test_data,
         batch_size=1, shuffle=False, num_workers=2)
