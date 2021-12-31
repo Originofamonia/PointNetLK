@@ -64,7 +64,7 @@ class RNN(nn.Module):
 
 
 def train_mlp(labels, preds, x, y, train_ids, test_ids):
-    epochs = 30
+    epochs = 80
     device = 'cuda'
     x_train = x[train_ids]
     y_train = y[train_ids]
@@ -136,7 +136,7 @@ def main():
     # add reorder by L1 distance before classifier
     x0 = reorder_by_distance(x0)  # unipolar
     x1 = reorder_by_distance(x1)  # bipolar
-    kfold = KFold(n_splits=8, shuffle=True)  # leave one out cross validation
+    kfold = KFold(n_splits=8, shuffle=True)  # LOOCV
 
     preds = []
     labels = []
