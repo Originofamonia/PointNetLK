@@ -79,7 +79,7 @@ def train_mlp(labels, preds, x, y, train_ids, test_ids):
         test_data,
         batch_size=1, shuffle=False, num_workers=2)
 
-    model = RNN().to(device)
+    model = MLP().to(device)
     model.train()
     criterion = nn.CrossEntropyLoss()
     optimizer = torch.optim.Adam(model.parameters(), lr=1e-3)
@@ -89,7 +89,7 @@ def train_mlp(labels, preds, x, y, train_ids, test_ids):
         for i, data in enumerate(pbar):
             data = tuple(item.to(device) for item in data)
             x, y = data
-            x = x.unsqueeze(-1)
+            # x = x.unsqueeze(-1)
             optimizer.zero_grad()
             outputs = model(x)
             loss = criterion(outputs, y)
@@ -101,7 +101,7 @@ def train_mlp(labels, preds, x, y, train_ids, test_ids):
     for i, data in enumerate(test_loader):
         data = tuple(item.to(device) for item in data)
         x, y = data
-        x = x.unsqueeze(-1)
+        # x = x.unsqueeze(-1)
         outputs = model(x)
         pred_cls = outputs.data.max(1)[1].item()
         preds.append(pred_cls)
