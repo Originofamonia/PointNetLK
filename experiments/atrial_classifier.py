@@ -28,17 +28,17 @@ os.environ['CUDA_VISIBLE_DIVICES'] = '1'
 class MLP(nn.Module):
     """Discriminator model for source domain."""
 
-    def __init__(self, input_dim=306, dropout=0.4):
+    def __init__(self, input_dim=406, dropout=0.4):
         """Init discriminator."""
         super(MLP, self).__init__()
         self.layer = nn.Sequential(
-            nn.Linear(input_dim, 300),
+            nn.Linear(input_dim, 400),
             nn.Dropout(p=dropout),
             nn.LeakyReLU(),
             # nn.Linear(300, 300),
             # nn.Dropout(p=dropout),
             # nn.LeakyReLU(),
-            nn.Linear(300, 2),
+            nn.Linear(400, 2),
             nn.Sigmoid()
         )
 
