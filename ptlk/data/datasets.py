@@ -58,7 +58,7 @@ class Atrial(Dataset):
             self.af_labels = self.filtered_df['AF type'].values[:]
             self.re_af_labels = self.filtered_df['1Y re AF'].values[:]
         else:
-            self.study_ids = self.filtered_df['Study number'].values[1:]
+            self.study_ids = self.filtered_df['Study number'].values
             self.af_labels = self.filtered_df['AF type'].values[1:]
             self.re_af_labels = self.filtered_df['1Y re AF'].values[1:]
 
