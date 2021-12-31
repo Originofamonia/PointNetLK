@@ -157,7 +157,7 @@ def main():
     roc_auc = roc_auc_score(labels, preds)
     print(f'preds: {preds}; labels: {labels}')
     print(f'acc: {acc}, precision: {precision:.3f}, recall: {recall:.3f}, '
-          f'f1: {f1:.3f}, roc_auc: {roc_auc}, pr_auc: {pr_auc:.3f}')
+          f'f1: {f1:.3f}, roc_auc: {roc_auc:.3f}, pr_auc: {pr_auc:.3f}')
 
 
 def svm_classifier(labels, preds, x, y, train_ids, test_ids):
