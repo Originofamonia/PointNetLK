@@ -69,7 +69,7 @@ class Atrial(Dataset):
         points = torch.from_numpy(np.float32(df[['x_norm', 'y_norm', 'z_norm']].values))
 
         unipolar = torch.from_numpy(df['unipolar'].values)
-        bipolar = torch.from_numpy(df['unipolar'].values)
+        bipolar = torch.from_numpy(df['bipolar'].values)
 
         af_type = torch.from_numpy(np.asarray(self.af_labels[idx]))
         re_af_type = torch.from_numpy(np.asarray(self.re_af_labels[idx]))
@@ -92,7 +92,7 @@ class Atrial(Dataset):
             np.float32(df[['x_norm', 'y_norm', 'z_norm']].values))
 
         unipolar = torch.from_numpy(df['unipolar'].values)
-        bipolar = torch.from_numpy(df['unipolar'].values)
+        bipolar = torch.from_numpy(df['bipolar'].values)
 
         af_type = torch.from_numpy(np.asarray(self.filtered_df['AF type'].values[0]))
         re_af_type = torch.from_numpy(np.asarray(self.filtered_df['1Y re AF'].values[0]))

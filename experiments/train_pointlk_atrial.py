@@ -410,7 +410,7 @@ class Action:
             p0, unipolar0, bipolar0, af_type0, re_af_type0 = template_all
             p1, unipolar1, bipolar1, af_type1, re_af_type1 = source_all
             self.plot_one_pointcloud(p0[0], 'template')
-            self.plot_one_pointcloud(p1[0], i)
+            self.plot_one_pointcloud(p1[0], f'source_{i}')
 
     def plot_polars(self, testset):
         """
@@ -434,22 +434,24 @@ class Action:
 
             if i == 0:  # only plot template polar once
                 fig = plt.figure(figsize=(8, 8))
-                ax1 = fig.add_subplot(111)
-                plt.plot(unipolar0[0].detach().cpu().numpy(), c='y',
+                ax0 = fig.add_subplot(211)
+                ax0.plot(unipolar0[0].detach().cpu().numpy(), c='y',
                          label=f'template_uni_{af_type0[0]}_{re_af_type0[0]}')
-                plt.plot(bipolar0[0].detach().cpu().numpy(), c='m',
+                ax0.legend()
+                ax1 = fig.add_subplot(212)
+                ax1.plot(bipolar0[0].detach().cpu().numpy(), c='m',
                          label=f'template_bi')
                 ax1.legend()
                 plt.savefig(f'polar_template.jpg')
                 plt.close(fig)
 
             fig = plt.figure(figsize=(8, 8))  # plot other polars
-            ax1 = fig.add_subplot(111)
+            ax0 = fig.add_subplot(111)
             plt.plot(unipolar1[0].detach().cpu().numpy(), c='y',
                      label=f'uni_{i}')
             plt.plot(bipolar1[0].detach().cpu().numpy(), c='m',
                      label=f'bi_{i}')
-            ax1.legend()
+            ax0.legend()
             plt.savefig(f'polar_{i}.jpg')
             plt.close(fig)
 

@@ -188,13 +188,14 @@ def plot_data_y0():
     voltage1 = x1[:, :, -1]
     for i in range(len(voltage0)):
         fig = plt.figure(figsize=(8, 8))
-        ax0 = fig.add_subplot(211)
+        ax0 = fig.add_subplot(211)  # 211: row, col, index
         ax1 = fig.add_subplot(212)
 
         ax0.plot(voltage0[i], c='b', label=f'x0, y0: {y0[i]}; y1: {y1[i]}')
         ax1.plot(voltage1[i], c='r', label=f'x1, y0: {y0[i]}; y1: {y1[i]}')
         # fig.xlabel(f'{desc}')
         ax0.legend()
+        ax1.legend()
         plt.savefig(f'voltage_{i}.jpg')
         plt.close(fig)
 
