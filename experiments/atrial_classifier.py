@@ -139,7 +139,7 @@ def main():
     x0 = reorder_by_distance(x0)  # unipolar
     x1 = reorder_by_distance(x1)  # bipolar
     x_cat = np.concatenate((x0, x1), axis=-1)  # ensemble
-    kfold = KFold(n_splits=8, shuffle=True)  # LOOCV
+    kfold = KFold(n_splits=8, shuffle=False)  # LOOCV
 
     preds = []
     labels = []
