@@ -143,9 +143,9 @@ def main():
 
     preds = []
     labels = []
-    for fold, (train_ids, test_ids) in enumerate(kfold.split(X=x_cat, y=y0)):
+    for fold, (train_ids, test_ids) in enumerate(kfold.split(X=x_cat, y=y1)):
         x = x_cat
-        y = y0
+        y = y1
         # svm_classifier(labels, preds, x, y, train_ids, test_ids)
         # lr_classifier(labels, preds, x, y, train_ids, test_ids)
         train_mlp(labels, preds, x, y, train_ids, test_ids)
