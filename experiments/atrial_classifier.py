@@ -80,7 +80,7 @@ def train_mlp(labels, preds, x, y, train_ids, test_ids):
         test_data,
         batch_size=1, shuffle=False, num_workers=2)
 
-    model = MLP().to(device)
+    model = MLP(input_dim=812).to(device)  # input_dim=812 for ensemble
     model.train()
     criterion = nn.CrossEntropyLoss()
     optimizer = torch.optim.Adam(model.parameters(), lr=1e-3)
@@ -107,52 +107,6 @@ def train_mlp(labels, preds, x, y, train_ids, test_ids):
         pred_cls = outputs.data.max(1)[1].item()
         preds.append(pred_cls)
         labels.append(y[0].item())
-
-
-def train_ensemble_mlp(labels, preds, x0, x1, y, train_ids, test_ids):
-    """
-    train ensemble classifier, ensemble on 2 probability outputs
-    """
-    epochs = 30
-    device = 'cuda'
-    x_train0 = x0[train_ids]
-    y_train0 = y[train_ids]
-    x_test = x0[test_ids]
-    y_test = y[test_ids]
-    train_data = ptlk.data.datasets.Voltages(x=x_train0, y=y_train0)
-    test_data = ptlk.data.datasets.Voltages(x=x_test, y=y_test)
-    train_loader = torch.utils.data.DataLoader(
-        train_data,
-        batch_size=1, shuffle=True, num_workers=2)
-    test_loader = torch.utils.data.DataLoader(
-        test_data,
-        batch_size=1, shuffle=False, num_workers=2)
-
-    model = MLP().to(device)
-    model.train()
-    criterion = nn.CrossEntropyLoss()
-    optimizer = torch.optim.Adam(model.parameters(), lr=1e-3)
-
-    for e in range(epochs):
-        pbar = tqdm(train_loader)
-        for i, data in enumerate(pbar):
-            data = tuple(item.to(device) for item in data)
-            x, y = data
-            # x = x.unsqueeze(-1)
-            optimizer.zero_grad()
-            outputs = model(x)
-            loss = criterion(outputs, y)
-            loss.backward()
-            optimizer.step()
-            pbar.set_description(f'loss: {loss.item()}')
-
-    model.eval()
-    for i, data in enumerate(test_loader):
-        data = tuple(item.to(device) for item in data)
-        x, y = data
-        # x = x.unsqueeze(-1)
-        outputs = model(x)
-        pred_cls = outputs.data.max(1)[1].item()
 
 
 def reorder_by_distance(x):
@@ -184,12 +138,13 @@ def main():
     # add reorder by L1 distance before classifier
     x0 = reorder_by_distance(x0)  # unipolar
     x1 = reorder_by_distance(x1)  # bipolar
+    x_cat = np.concatenate((x0, x1), dim=-1)  # ensemble
     kfold = KFold(n_splits=8, shuffle=True)  # LOOCV
 
     preds = []
     labels = []
-    for fold, (train_ids, test_ids) in enumerate(kfold.split(X=x1, y=y0)):
-        x = x1
+    for fold, (train_ids, test_ids) in enumerate(kfold.split(X=x_cat, y=y0)):
+        x = x_cat
         y = y0
         # svm_classifier(labels, preds, x, y, train_ids, test_ids)
         # lr_classifier(labels, preds, x, y, train_ids, test_ids)
