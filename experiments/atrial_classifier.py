@@ -10,6 +10,7 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import KFold, GridSearchCV
 from sklearn.metrics import precision_score, recall_score, f1_score, \
     accuracy_score, roc_auc_score, precision_recall_curve, auc
+from sklearn.ensemble import VotingClassifier
 from tqdm import tqdm
 import numpy as np
 import torch
@@ -106,6 +107,52 @@ def train_mlp(labels, preds, x, y, train_ids, test_ids):
         pred_cls = outputs.data.max(1)[1].item()
         preds.append(pred_cls)
         labels.append(y[0].item())
+
+
+def train_ensemble_mlp(labels, preds, x0, x1, y, train_ids, test_ids):
+    """
+    train ensemble classifier, ensemble on 2 probability outputs
+    """
+    epochs = 30
+    device = 'cuda'
+    x_train0 = x0[train_ids]
+    y_train0 = y[train_ids]
+    x_test = x0[test_ids]
+    y_test = y[test_ids]
+    train_data = ptlk.data.datasets.Voltages(x=x_train0, y=y_train0)
+    test_data = ptlk.data.datasets.Voltages(x=x_test, y=y_test)
+    train_loader = torch.utils.data.DataLoader(
+        train_data,
+        batch_size=1, shuffle=True, num_workers=2)
+    test_loader = torch.utils.data.DataLoader(
+        test_data,
+        batch_size=1, shuffle=False, num_workers=2)
+
+    model = MLP().to(device)
+    model.train()
+    criterion = nn.CrossEntropyLoss()
+    optimizer = torch.optim.Adam(model.parameters(), lr=1e-3)
+
+    for e in range(epochs):
+        pbar = tqdm(train_loader)
+        for i, data in enumerate(pbar):
+            data = tuple(item.to(device) for item in data)
+            x, y = data
+            # x = x.unsqueeze(-1)
+            optimizer.zero_grad()
+            outputs = model(x)
+            loss = criterion(outputs, y)
+            loss.backward()
+            optimizer.step()
+            pbar.set_description(f'loss: {loss.item()}')
+
+    model.eval()
+    for i, data in enumerate(test_loader):
+        data = tuple(item.to(device) for item in data)
+        x, y = data
+        # x = x.unsqueeze(-1)
+        outputs = model(x)
+        pred_cls = outputs.data.max(1)[1].item()
 
 
 def reorder_by_distance(x):
