@@ -27,7 +27,9 @@ os.environ['CUDA_VISIBLE_DIVICES'] = '1'
 
 
 class MLP(nn.Module):
-    """Discriminator model for source domain."""
+    """
+    MLP classifier for unipolar or bipolar
+    """
 
     def __init__(self, input_dim=406, dropout=0.4):
         """Init discriminator."""
@@ -46,6 +48,39 @@ class MLP(nn.Module):
     def forward(self, x):
         """Forward the discriminator."""
         return self.layer(x)
+
+
+class MLPEnsemble(nn.Module):
+    """
+    ensemble 2 MLP for unipolar + bipolar
+    """
+    def __init__(self, input_dim=406, dropout=0.4):
+        """Init discriminator."""
+        super(MLPEnsemble, self).__init__()
+        self.layer1 = nn.Sequential(
+            nn.Linear(input_dim, 400),
+            nn.Dropout(p=dropout),
+            nn.LeakyReLU(),
+            # nn.Linear(300, 300),
+            # nn.Dropout(p=dropout),
+            # nn.LeakyReLU(),
+            nn.Linear(400, 2),
+            # nn.Sigmoid()
+        )
+        self.layer2 = nn.Sequential(
+            nn.Linear(input_dim, 400),
+            nn.Dropout(p=dropout),
+            nn.LeakyReLU(),
+            # nn.Linear(300, 300),
+            # nn.Dropout(p=dropout),
+            # nn.LeakyReLU(),
+            nn.Linear(400, 2),
+            # nn.Sigmoid()
+        )
+
+    def forward(self, x1, x2):
+        """Forward the discriminator."""
+        return self.layer1(x1) + self.layer2(x2)
 
 
 class RNN(nn.Module):
