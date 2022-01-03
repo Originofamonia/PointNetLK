@@ -30,9 +30,7 @@ class MLP(nn.Module):
     """
     MLP classifier for unipolar or bipolar
     """
-
     def __init__(self, input_dim=406, dropout=0.4):
-        """Init discriminator."""
         super(MLP, self).__init__()
         self.layer = nn.Sequential(
             nn.Linear(input_dim, 400),
@@ -46,7 +44,6 @@ class MLP(nn.Module):
         )
 
     def forward(self, x):
-        """Forward the discriminator."""
         return self.layer(x)
 
 
@@ -55,7 +52,6 @@ class MLPEnsemble(nn.Module):
     ensemble 2 MLP for unipolar + bipolar
     """
     def __init__(self, input_dim=406, dropout=0.4):
-        """Init discriminator."""
         super(MLPEnsemble, self).__init__()
         self.layer1 = nn.Sequential(
             nn.Linear(input_dim, 400),
@@ -79,7 +75,6 @@ class MLPEnsemble(nn.Module):
         )
 
     def forward(self, x1, x2):
-        """Forward the discriminator."""
         return self.layer1(x1) + self.layer2(x2)
 
 
@@ -144,6 +139,53 @@ def train_mlp(labels, preds, x, y, train_ids, test_ids):
         labels.append(y[0].item())
 
 
+def train_ensemble_mlp(labels, preds, x1, x2, y, train_ids, test_ids):
+    epochs = 30
+    device = 'cuda'
+    x1_train = x1[train_ids]
+    y_train = y[train_ids]
+    x1_test = x1[test_ids]
+    y_test = y[test_ids]
+    x2_train = x2[train_ids]
+    x2_test = x2[test_ids]
+    train_data = ptlk.data.datasets.EnsembleVoltages(x1=x1_train, x2=x2_train, y=y_train)
+    test_data = ptlk.data.datasets.EnsembleVoltages(x1=x1_test, x2=x2_test, y=y_test)
+    train_loader = torch.utils.data.DataLoader(
+        train_data,
+        batch_size=1, shuffle=True, num_workers=2)
+    test_loader = torch.utils.data.DataLoader(
+        test_data,
+        batch_size=1, shuffle=False, num_workers=2)
+
+    model = MLPEnsemble().to(device)  # input_dim=812 for ensemble
+    model.train()
+    criterion = nn.CrossEntropyLoss()
+    optimizer = torch.optim.Adam(model.parameters(), lr=1e-3)
+
+    for e in range(epochs):
+        pbar = tqdm(train_loader)
+        for i, data in enumerate(pbar):
+            data = tuple(item.to(device) for item in data)
+            x1, x2, y = data
+            # x = x.unsqueeze(-1)
+            optimizer.zero_grad()
+            outputs = model(x1, x2)
+            loss = criterion(outputs, y)
+            loss.backward()
+            optimizer.step()
+            pbar.set_description(f'loss: {loss.item():.3f}')
+
+    model.eval()
+    for i, data in enumerate(test_loader):
+        data = tuple(item.to(device) for item in data)
+        x1, x2,  y = data
+        # x = x.unsqueeze(-1)
+        outputs = model(x1, x2)
+        pred_cls = outputs.data.max(1)[1].item()
+        preds.append(pred_cls)
+        labels.append(y[0].item())
+
+
 def reorder_by_distance(x):
     """
     reorder points by their coordinates L1 distance to original point and return
@@ -183,7 +225,8 @@ def main():
         y = y0
         # svm_classifier(labels, preds, x, y, train_ids, test_ids)
         # lr_classifier(labels, preds, x, y, train_ids, test_ids)
-        train_mlp(labels, preds, x, y, train_ids, test_ids)
+        # train_mlp(labels, preds, x, y, train_ids, test_ids)
+        train_ensemble_mlp(labels, preds, x0, x1, y, train_ids, test_ids)
 
     acc = accuracy_score(labels, preds)
     precision = precision_score(labels, preds)

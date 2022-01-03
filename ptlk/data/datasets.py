@@ -39,6 +39,19 @@ class Voltages(Dataset):
         return len(self.y)
 
 
+class EnsembleVoltages(Dataset):
+    def __init__(self, x1, x2, y):
+        self.x1 = torch.from_numpy(x1).float()
+        self.x2 = torch.from_numpy(x2).float()
+        self.y = torch.from_numpy(y).long()
+
+    def __getitem__(self, idx):
+        return self.x1[idx], self.x2[idx], self.y[idx]
+
+    def __len__(self):
+        return len(self.y)
+
+
 class Atrial(Dataset):
     """ atrial dataset """
 
