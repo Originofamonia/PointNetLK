@@ -100,7 +100,7 @@ class Atrial(Dataset):
         study_id = self.filtered_df['Study number'].values[self.template_id]
         path = f'{self.dataset_path}/Cleaned_PatientData/{study_id}/{study_id}_eam_data.csv'
         df = pd.read_csv(path)
-        df = df.sample(n=406, replace=False, random_state=np.random.randint(444))
+        df = df.sample(n=1006, replace=False, random_state=np.random.randint(444))
         points = torch.from_numpy(
             np.float32(df[['x_norm', 'y_norm', 'z_norm']].values))
 
