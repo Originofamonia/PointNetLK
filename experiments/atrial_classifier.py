@@ -110,7 +110,7 @@ def train_mlp(labels, preds, x, y, train_ids, test_ids):
         test_data,
         batch_size=1, shuffle=False, num_workers=2)
 
-    model = MLP(input_dim=812).to(device)  # input_dim=812 for ensemble
+    model = MLP(input_dim=1006).to(device)  # input_dim=812 for ensemble
     model.train()
     criterion = nn.CrossEntropyLoss()
     optimizer = torch.optim.Adam(model.parameters(), lr=1e-3)
@@ -220,13 +220,13 @@ def main():
 
     preds = []
     labels = []
-    for fold, (train_ids, test_ids) in enumerate(kfold.split(X=x_cat, y=y0)):
-        x = x_cat
+    for fold, (train_ids, test_ids) in enumerate(kfold.split(X=x0, y=y0)):
+        x = x0
         y = y0
         # svm_classifier(labels, preds, x, y, train_ids, test_ids)
         # lr_classifier(labels, preds, x, y, train_ids, test_ids)
-        # train_mlp(labels, preds, x, y, train_ids, test_ids)
-        train_ensemble_mlp(labels, preds, x0, x1, y, train_ids, test_ids)
+        train_mlp(labels, preds, x, y, train_ids, test_ids)
+        # train_ensemble_mlp(labels, preds, x0, x1, y, train_ids, test_ids)
 
     acc = accuracy_score(labels, preds)
     precision = precision_score(labels, preds)
