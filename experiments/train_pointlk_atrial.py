@@ -508,7 +508,7 @@ class Action:
 
         ax.scatter(p1[:, 0], p1[:, 1], p1[:, 2], c='b', label='source')
         ax.scatter(p0[:, 0], p0[:, 1], p0[:, 2], c='r', label='template')
-        fig.text(f'{desc}')
+        fig.text(0.5, 0.01, f'{desc}')
         ax.legend()
         plt.savefig(f'{desc}.jpg')
 
