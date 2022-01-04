@@ -64,6 +64,7 @@ class Atrial(Dataset):
         labels_df = pd.read_csv(f'{dataset_path}/label.csv')
         self.filtered_df = labels_df[labels_df['Study number'].isin(self.dirs)]  # total 8 samples
         # self.get_n_points()  # only need once
+        self.n_points = 1006
         self.template_id = 0  # select i as the template for inference
         if training:
             self.study_ids = self.filtered_df['Study number'].values[:]
@@ -78,7 +79,7 @@ class Atrial(Dataset):
         study_id = self.study_ids[idx]
         path = f'{self.dataset_path}/Cleaned_PatientData/{study_id}/{study_id}_eam_data.csv'
         df = pd.read_csv(path)
-        df = df.sample(n=1006, replace=True, random_state=np.random.randint(444))
+        df = df.sample(n=self.n_points, replace=True, random_state=np.random.randint(444))
         points = torch.from_numpy(np.float32(df[['x_norm', 'y_norm', 'z_norm']].values))
 
         unipolar = torch.from_numpy(df['unipolar'].values)
@@ -100,7 +101,7 @@ class Atrial(Dataset):
         study_id = self.filtered_df['Study number'].values[self.template_id]
         path = f'{self.dataset_path}/Cleaned_PatientData/{study_id}/{study_id}_eam_data.csv'
         df = pd.read_csv(path)
-        df = df.sample(n=1006, replace=True, random_state=np.random.randint(444))
+        df = df.sample(n=self.n_points, replace=True, random_state=np.random.randint(444))
         points = torch.from_numpy(
             np.float32(df[['x_norm', 'y_norm', 'z_norm']].values))
 
