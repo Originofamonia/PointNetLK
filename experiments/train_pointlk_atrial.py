@@ -298,7 +298,7 @@ class Action:
 
     def save_pointcloud(self, model, testset):
         """
-        save inferred point cloud with unipolar/bipolar
+        save registered point cloud coordinates with unipolar&bipolar
         """
         # dataloader
         testloader = torch.utils.data.DataLoader(
@@ -508,7 +508,7 @@ class Action:
 
         ax.scatter(p1[:, 0], p1[:, 1], p1[:, 2], c='b', label='source')
         ax.scatter(p0[:, 0], p0[:, 1], p0[:, 2], c='r', label='template')
-        # fig.xlabel(f'{desc}')
+        fig.text(f'{desc}')
         ax.legend()
         plt.savefig(f'{desc}.jpg')
 
