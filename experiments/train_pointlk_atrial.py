@@ -168,7 +168,7 @@ def train_ptlk(args, trainset, testset, action):
     # action.plot_all_clouds(testset)
     # action.plot_polars(testset)
     action.save_pointcloud(model, testset)
-    # action.infer_plot(model, testset)
+    action.infer_plot(model, testset)
 
 
 def save_checkpoint(state, outfile, suffix):
@@ -344,7 +344,7 @@ class Action:
 
     def infer_plot(self, model, testset):
         """
-        infer on training & test sets to plot point cloud
+        plot registered point clouds
         """
         # if not torch.cuda.is_available():
         #     self.args.device = 'cpu'
@@ -392,7 +392,7 @@ class Action:
 
     def plot_all_clouds(self, testset):
         """
-        plot all point clouds
+        plot all original point clouds
         """
         self.args.device = torch.device(self.args.device)
 
