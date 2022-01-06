@@ -208,6 +208,7 @@ def reorder_by_distance(x):
 def reorder_by_nearest_neighbor(x):
     """
     reorder sources points by their nearest neighbor in the template
+    return sorted voltages
     """
     # template = x[0]
     template_coord = x[0, :, :3]
