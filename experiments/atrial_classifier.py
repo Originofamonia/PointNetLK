@@ -215,8 +215,8 @@ def reorder_by_nearest_neighbor(x):
     sorted_voltages = [x[0, :, 3]]
     # for template points
     for i, t_pt in enumerate(template_coord):
-        dxyz = sources_coords - t_pt
-        print(dxyz)
+        dxyz = sources_coords - t_pt  # [7, dim, 3]
+        distances = np.sum(np.abs(dxyz), axis=-1)
 
     # for i, src in enumerate(sources):
     #     sorted_indices = np.zeros(src.shape)
