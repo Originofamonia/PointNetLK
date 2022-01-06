@@ -221,7 +221,7 @@ def reorder_by_nearest_neighbor(x):
             dist = np.sum(np.abs(dxyz), axis=-1)
             sorted_indices.append(np.argmin(dist, axis=-1))
 
-        sorted_voltages.append(np.arrange(src, sorted_indices))
+        sorted_voltages.append(np.arrange(src[:, 3], sorted_indices))
 
     return np.asarray(sorted_voltages)
 
