@@ -209,7 +209,7 @@ def reorder_by_nearest_neighbor(x):
     # template = x[0]
     template_coord = x[0, :, :3]
     sources = x[1:]
-    sorted_voltages = [x[0, :, 4]]
+    sorted_voltages = [x[0, :, 3]]
     for i, src in enumerate(sources):
         sorted_indices = []
         for j, src_pt in enumerate(src):
