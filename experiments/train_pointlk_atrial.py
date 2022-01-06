@@ -154,15 +154,15 @@ def train_ptlk(args, trainset, testset, action):
         #             val_loss, running_info, val_info)
 
         # if is_best:
-            # snap = {'epoch': epoch + 1,
-            #         'model': model.state_dict(),
-            #         'min_loss': min_loss,
-            #         'optimizer': optimizer.state_dict(), }
-            # save_checkpoint(snap, args.outfile, 'snap_best')
+        # snap = {'epoch': epoch + 1,
+        #         'model': model.state_dict(),
+        #         'min_loss': min_loss,
+        #         'optimizer': optimizer.state_dict(), }
+        # save_checkpoint(snap, args.outfile, 'snap_best')
     # save_checkpoint(model.state_dict(), args.outfile, 'best')
 
-        # save_checkpoint(snap, args.outfile, 'snap_last')
-        # save_checkpoint(model.state_dict(), args.outfile, 'model_last')
+    # save_checkpoint(snap, args.outfile, 'snap_last')
+    # save_checkpoint(model.state_dict(), args.outfile, 'model_last')
 
     LOGGER.debug('train, end')
     # action.plot_all_clouds(testset)
@@ -216,7 +216,8 @@ class Action:
         return ptnet
 
     def create_from_pointnet_features(self, ptnet):
-        return ptlk.pointlk.PointLK(ptnet, self.args.delta, self.args.learn_delta)
+        return ptlk.pointlk.PointLK(ptnet, self.args.delta,
+                                    self.args.learn_delta)
 
     def train_1(self, model, trainloader, optimizer):
         model.train()
@@ -333,14 +334,16 @@ class Action:
                 y0_list.append(af_type0[0].detach().cpu().numpy())
                 y1_list.append(re_af_type0[0].detach().cpu().numpy())
 
-            x0 = torch.cat((rotated_p1, unipolar1[0].unsqueeze(-1)), dim=-1)  # append source
+            x0 = torch.cat((rotated_p1, unipolar1[0].unsqueeze(-1)),
+                           dim=-1)  # append source
             x_uni_list.append(x0.detach().cpu().numpy())
             x1 = torch.cat((rotated_p1, bipolar1[0].unsqueeze(-1)), dim=-1)
             x_bi_list.append(x1.detach().cpu().numpy())
 
             y0_list.append(af_type1[0].detach().cpu().numpy())
             y1_list.append(re_af_type1[0].detach().cpu().numpy())
-        np.savez(f'saved_pt_{self.args.epochs}.npz', x0=x_uni_list, x1=x_bi_list, y0=y0_list, y1=y1_list, dtype=object)
+        np.savez(f'saved_pt_{self.args.epochs}.npz', x0=x_uni_list,
+                 x1=x_bi_list, y0=y0_list, y1=y1_list, dtype=object)
 
     def infer_plot(self, model, testset):
         """
@@ -350,7 +353,7 @@ class Action:
         #     self.args.device = 'cpu'
         self.args.device = torch.device(self.args.device)
 
-        LOGGER.debug('Trainer (PID=%d), %s', os.getpid(),)
+        LOGGER.debug('Trainer (PID=%d), %s', os.getpid(), )
 
         # dataloader
         testloader = torch.utils.data.DataLoader(
@@ -380,8 +383,10 @@ class Action:
 
             g_est = model.g  # p1 -> p0, p0 = se3.transform(g_est, p1)
             desc = f'before_{i}'
-            self.plot_pointcloud(p0[0], p1[0], desc=desc)  # plot before transform
-            p11_4 = torch.cat((p1[0], unipolar1[0].unsqueeze(dim=-1)), dim=-1).float()
+            self.plot_pointcloud(p0[0], p1[0],
+                                 desc=desc)  # plot before transform
+            p11_4 = torch.cat((p1[0], unipolar1[0].unsqueeze(dim=-1)),
+                              dim=-1).float()
             # print(p11_4.size(), g_est.size())
             rotated_p1 = self.transform(g_est, p1[0])
             # print(rotated_p1[:, 0:3] - p1[0])
@@ -454,7 +459,6 @@ class Action:
             ax0.legend()
             plt.savefig(f'polar_{i}.jpg')
             plt.close(fig)
-
 
     def transform(self, g, a):
         """
@@ -530,11 +534,13 @@ def get_datasets(args):
     trainset = ptlk.data.datasets.AtrialTransform(traindata,
                                                   ptlk.data.transforms.RandomTransformSE3(
                                                       args.mag,
-                                                      mag_randomly), training=True)
+                                                      mag_randomly),
+                                                  training=True)
     testset = ptlk.data.datasets.AtrialTransform(testdata,
                                                  ptlk.data.transforms.RandomTransformSE3(
                                                      args.mag,
-                                                     mag_randomly), training=False)
+                                                     mag_randomly),
+                                                 training=False)
 
     return trainset, testset
 

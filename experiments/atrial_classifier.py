@@ -202,6 +202,18 @@ def reorder_by_distance(x):
     return np.asarray(sorted_voltages)
 
 
+def reorder_by_nearest_neighbor(x):
+    """
+    reorder sources points by their nearest neighbor in the template
+    """
+    template = x[0]
+    sources = x[1:]
+    for i, src in enumerate(sources):
+        for j, src_pt in enumerate(src):
+            print(src_pt)
+            return src_pt
+
+
 def main():
     """
     implement leave one out cross validation
@@ -213,8 +225,10 @@ def main():
     y0 = 2 - y0  # values of 1, 2 -> 1, 0, AF type
     y1 = 1 - y1  # 1Y re AF
     # add reorder by L1 distance before classifier
-    x0 = reorder_by_distance(x0)  # unipolar
-    x1 = reorder_by_distance(x1)  # bipolar
+    # x0 = reorder_by_distance(x0)  # unipolar
+    # x1 = reorder_by_distance(x1)  # bipolar
+    x0 = reorder_by_nearest_neighbor(x0)
+    x1 = reorder_by_nearest_neighbor(x1)
     x_cat = np.concatenate((x0, x1), axis=-1)  # ensemble
     kfold = KFold(n_splits=8, shuffle=False)  # LOOCV
 
