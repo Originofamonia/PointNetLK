@@ -214,7 +214,7 @@ def reorder_by_nearest_neighbor(x):
         sorted_indices = []
         for j, src_pt in enumerate(src):
             src_pt_coord = src_pt[:3]
-            dxyz = src_pt_coord - template_coord  # [dim, 3]
+            dxyz = template_coord - src_pt_coord  # [dim, 3]
             dist = np.sum(np.abs(dxyz), axis=-1)
             sorted_indices.append(np.argmin(dist, axis=-1))
 
