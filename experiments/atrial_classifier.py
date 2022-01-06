@@ -140,6 +140,9 @@ def train_mlp(labels, preds, x, y, train_ids, test_ids):
 
 
 def train_ensemble_mlp(labels, preds, x1, x2, y, train_ids, test_ids):
+    """
+    no, acc bad
+    """
     epochs = 30
     device = 'cuda'
     x1_train = x1[train_ids]
@@ -218,7 +221,7 @@ def reorder_by_nearest_neighbor(x):
             dist = np.sum(np.abs(dxyz), axis=-1)
             sorted_indices.append(np.argmin(dist, axis=-1))
 
-        sorted_voltages.append(src[sorted_indices])
+        sorted_voltages.append(np.arrange(src, sorted_indices))
 
     return np.asarray(sorted_voltages)
 
