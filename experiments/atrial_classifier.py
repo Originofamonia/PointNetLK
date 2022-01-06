@@ -250,6 +250,7 @@ def main():
     x1 = reorder_by_nearest_neighbor(x1)
     x_cat = np.concatenate((x0, x1), axis=-1)  # ensemble
     kfold = KFold(n_splits=8, shuffle=False)  # LOOCV
+    plot_data_y0(x0, x1, y0, y1)
 
     preds = []
     labels = []
@@ -297,23 +298,23 @@ def lr_classifier(labels, preds, x0, y0, train_ids, test_ids):
     labels.append(y_test[0])
 
 
-def plot_data_y0():
+def plot_data_y0(x0, x1, y0, y1):
     """
-    plot data & labels
+    plot voltage & labels
     """
-    npzfile = np.load(f'saved_pt_10.npz', allow_pickle=True)
-    x0, x1, y0, y1 = npzfile['x0'], npzfile['x1'], npzfile['y0'], npzfile['y1']
-    x0 = np.reshape(x0, (x0.shape[0], -1, 4))  # [:, :, -1]  # [8， -1]
-    x1 = np.reshape(x1, (x1.shape[0], -1, 4))  # [:, :, -1]  # [8， -1]
-    voltage0 = x0[:, :, -1]
-    voltage1 = x1[:, :, -1]
-    for i in range(len(voltage0)):
+    # npzfile = np.load(f'saved_pt_10.npz', allow_pickle=True)
+    # x0, x1, y0, y1 = npzfile['x0'], npzfile['x1'], npzfile['y0'], npzfile['y1']
+    # x0 = np.reshape(x0, (x0.shape[0], -1, 4))  # [:, :, -1]  # [8， -1]
+    # x1 = np.reshape(x1, (x1.shape[0], -1, 4))  # [:, :, -1]  # [8， -1]
+    # voltage0 = x0[:, :, -1]
+    # voltage1 = x1[:, :, -1]
+    for i in range(len(x0)):
         fig = plt.figure(figsize=(8, 8))
         ax0 = fig.add_subplot(211)  # 211: row, col, index
         ax1 = fig.add_subplot(212)
 
-        ax0.plot(voltage0[i], c='b', label=f'x0, y0: {y0[i]}; y1: {y1[i]}')
-        ax1.plot(voltage1[i], c='r', label=f'x1, y0: {y0[i]}; y1: {y1[i]}')
+        ax0.plot(x0[i], c='b', label=f'x0, y0: {y0[i]}; y1: {y1[i]}')
+        ax1.plot(x1[i], c='r', label=f'x1, y0: {y0[i]}; y1: {y1[i]}')
         # fig.xlabel(f'{desc}')
         ax0.legend()
         ax1.legend()
