@@ -224,7 +224,7 @@ def reorder_by_nearest_neighbor(x):
         sorted_idx = np.argmin(distances, axis=-1)  # [7]
         sorted_src_indices.append(sorted_idx)
 
-    sorted_src_indices = np.asarray(sorted_src_indices)
+    sorted_src_indices = np.asarray(sorted_src_indices).T
     print(sorted_src_indices)
 
     # for i, src in enumerate(sources):
