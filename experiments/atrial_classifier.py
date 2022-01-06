@@ -250,7 +250,7 @@ def main():
     x1 = reorder_by_nearest_neighbor(x1)
     x_cat = np.concatenate((x0, x1), axis=-1)  # ensemble
     kfold = KFold(n_splits=8, shuffle=False)  # LOOCV
-    plot_data_y0(x0, x1, y0, y1)
+    # plot_data_y0(x0, x1, y0, y1)
 
     preds = []
     labels = []
