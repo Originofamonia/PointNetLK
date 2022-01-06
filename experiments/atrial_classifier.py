@@ -230,14 +230,6 @@ def reorder_by_nearest_neighbor(x):
     for i, item in enumerate(sorted_src_indices):
         sorted_voltages.append(src_voltages[i, item])
 
-    # for i, src in enumerate(sources):
-    #     sorted_idx = np.zeros(src.shape)
-    #     for j, src_pt in enumerate(src):
-    #         src_pt_coord = src_pt[:3]
-    #         dxyz = template_coord - src_pt_coord  # [dim, 3]
-    #         dist = np.sum(np.abs(dxyz), axis=-1)
-    #         sorted_idx.append(np.argmin(dist, axis=-1))
-
     return np.asarray(sorted_voltages)
 
 
@@ -261,8 +253,8 @@ def main():
 
     preds = []
     labels = []
-    for fold, (train_ids, test_ids) in enumerate(kfold.split(X=x1, y=y0)):
-        x = x1
+    for fold, (train_ids, test_ids) in enumerate(kfold.split(X=x0, y=y0)):
+        x = x0
         y = y0
         # svm_classifier(labels, preds, x, y, train_ids, test_ids)
         # lr_classifier(labels, preds, x, y, train_ids, test_ids)
