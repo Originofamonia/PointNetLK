@@ -212,20 +212,25 @@ def reorder_by_nearest_neighbor(x):
     # template = x[0]
     template_coord = x[0, :, :3]
     sources_coords = x[1:, :, :3]
+    src_voltages = x[1:, :, 3]
     sorted_voltages = [x[0, :, 3]]
+    sorted_src_voltages = []
+
     # for template points
     for i, t_pt in enumerate(template_coord):
+        # find t_pt's closes points in each source
         dxyz = sources_coords - t_pt  # [7, dim, 3]
         distances = np.sum(np.abs(dxyz), axis=-1)
-        print(distances)
+        sorted_idx = np.argmin(distances, axis=-1)
+        sorted_src_voltages.append(src_voltages[sorted_idx])
 
     # for i, src in enumerate(sources):
-    #     sorted_indices = np.zeros(src.shape)
+    #     sorted_idx = np.zeros(src.shape)
     #     for j, src_pt in enumerate(src):
     #         src_pt_coord = src_pt[:3]
     #         dxyz = template_coord - src_pt_coord  # [dim, 3]
     #         dist = np.sum(np.abs(dxyz), axis=-1)
-    #         sorted_indices.append(np.argmin(dist, axis=-1))
+    #         sorted_idx.append(np.argmin(dist, axis=-1))
 
         sorted_voltages.append(t_pt)
 
