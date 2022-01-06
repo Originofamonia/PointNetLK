@@ -110,7 +110,7 @@ def train_mlp(labels, preds, x, y, train_ids, test_ids):
         test_data,
         batch_size=1, shuffle=False, num_workers=2)
 
-    model = MLP(input_dim=1006).to(device)  # input_dim=812 for ensemble
+    model = MLP(input_dim=406).to(device)  # input_dim=812 for ensemble
     model.train()
     criterion = nn.CrossEntropyLoss()
     optimizer = torch.optim.Adam(model.parameters(), lr=1e-3)
