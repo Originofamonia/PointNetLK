@@ -110,7 +110,7 @@ def train_mlp(labels, preds, x, y, train_ids, test_ids):
         test_data,
         batch_size=1, shuffle=False, num_workers=2)
 
-    model = MLP(input_dim=406).to(device)  # input_dim=812 for ensemble
+    model = MLP(input_dim=812).to(device)  # input_dim=812 for ensemble
     model.train()
     criterion = nn.CrossEntropyLoss()
     optimizer = torch.optim.Adam(model.parameters(), lr=1e-3)
@@ -254,8 +254,8 @@ def main():
 
     preds = []
     labels = []
-    for fold, (train_ids, test_ids) in enumerate(kfold.split(X=x0, y=y0)):
-        x = x0
+    for fold, (train_ids, test_ids) in enumerate(kfold.split(X=x_cat, y=y0)):
+        x = x_cat
         y = y0
         # svm_classifier(labels, preds, x, y, train_ids, test_ids)
         # lr_classifier(labels, preds, x, y, train_ids, test_ids)
@@ -313,8 +313,8 @@ def plot_data_y0(x0, x1, y0, y1):
         ax0 = fig.add_subplot(211)  # 211: row, col, index
         ax1 = fig.add_subplot(212)
 
-        ax0.plot(x0[i], c='b', label=f'x0, y0: {y0[i]}; y1: {y1[i]}')
-        ax1.plot(x1[i], c='r', label=f'x1, y0: {y0[i]}; y1: {y1[i]}')
+        ax0.plot(x0[i], c='b', label=f'sample:{i}, x0, y0: {y0[i]}; y1: {y1[i]}')
+        ax1.plot(x1[i], c='r', label=f'sample:{i}, x1, y0: {y0[i]}; y1: {y1[i]}')
         # fig.xlabel(f'{desc}')
         ax0.legend()
         ax1.legend()
