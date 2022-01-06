@@ -217,6 +217,7 @@ def reorder_by_nearest_neighbor(x):
     for i, t_pt in enumerate(template_coord):
         dxyz = sources_coords - t_pt  # [7, dim, 3]
         distances = np.sum(np.abs(dxyz), axis=-1)
+        print(distances)
 
     # for i, src in enumerate(sources):
     #     sorted_indices = np.zeros(src.shape)
